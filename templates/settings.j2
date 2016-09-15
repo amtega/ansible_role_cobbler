@@ -1,0 +1,97 @@
+#
+# {{ ansible_managed }}
+#
+
+allow_duplicate_hostnames: 0
+allow_duplicate_ips: 0
+allow_duplicate_macs: 0
+allow_dynamic_settings: 0
+
+anamon_enabled: 0
+
+authn_pam_service: "login"
+auth_token_expiration: 3600
+
+cheetah_import_whitelist:
+ - "random"
+ - "re"
+ - "time"
+
+createrepo_flags: "-c cache -s sha"
+
+default_kickstart: /var/lib/cobbler/kickstarts/default.ks
+
+default_name_servers: []
+
+default_ownership:
+ - "admin"
+
+default_password_crypted: {{ cobbler_default_password_crypted }}
+
+default_template_type: "cheetah"
+
+enable_gpxe: 0
+
+enable_menu: 1
+
+http_port: 80
+
+kernel_options:
+ ksdevice: bootif
+ lang: ' '
+ text: ~
+
+manage_dhcp: 1
+manage_dns: 0
+manage_tftpd: 1
+manage_rsync: 0
+
+next_server: {{ cobbler_next_server }}
+
+pxe_just_once: 1
+
+pxe_template_dir: "/etc/cobbler/pxe"
+
+consoles: "/var/consoles"
+
+redhat_management_type: "off"
+redhat_management_server: "xmlrpc.rhn.redhat.com"
+redhat_management_key: ""
+redhat_management_permissive: 0
+
+register_new_installs: 0
+
+reposync_flags: "-l -n -d"
+
+restart_dns: 1
+restart_dhcp: 1
+
+run_install_triggers: 1
+
+server: {{ cobbler_server }}
+
+client_use_localhost: 0
+client_use_https: 0
+
+snippetsdir: /var/lib/cobbler/snippets
+
+template_remote_kickstarts: 0
+
+webdir: /var/www/cobbler
+
+xmlrpc_port: 25151
+
+yum_post_install_mirror: 1
+yum_distro_priority: 1
+yumdownloader_flags: "--resolve"
+
+serializer_pretty_json: 0
+
+replicate_rsync_options: "-avzH"
+replicate_repo_rsync_options: "-avzH"
+
+always_write_dhcp_entries: 0
+
+proxy_url_ext: {{ cobbler_proxy_url_ext }}
+proxy_url_int: ""
+

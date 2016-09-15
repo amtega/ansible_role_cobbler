@@ -1,0 +1,9 @@
+---
+# Role handlers
+
+#
+# Synchronize cobbler
+#
+
+- name: synchronize cobbler
+  command: cobbler sync

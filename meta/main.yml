@@ -1,0 +1,6 @@
+---
+# Role dependencies
+
+dependencies:
+  - { role: enterprise_linux }
+  - { role: xinetd,  xinetd_service: "{{ cobbler_xinetd_service_rsync }}" }

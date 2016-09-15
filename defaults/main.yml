@@ -1,0 +1,128 @@
+---
+# Role default lower priority variables
+
+#
+# Cobbler general config
+# 
+
+cobbler_default_password_crypted: "$1$hZtCu.xn$OcfOoLF7907a.3rd73PqK1"
+cobbler_next_server: "{{ ansible_default_ipv4.address }}"
+cobbler_server: "{{ ansible_default_ipv4.address }}"
+cobbler_proxy_url_ext: "{{ http_proxy_url }}"
+cobbler_config_dir: /var/lib/cobbler/config
+cobbler_tmp_dir: /var/www/cobbler/tmp
+cobbler_iso_dir: "{{ cobbler_tmp_dir }}/iso"
+
+#
+# Cobbler DHCP config 
+#
+
+# Format of the variables:
+#
+#  subnet: dhcp network address in format a.b.c.d
+#  netmask: dhcp network mask in format a.b.c.d
+#  routers: dhcp network router in format a.b.c.d
+#  dns_servers: list of dhcp DNS servers in format a.b.c.d
+#  range_start: dhcp range start in format a.b.c.d
+#  range_end: dhcp range end in format a.b.c.d
+#
+# Sample:
+#
+#  subnet: "192.168.13.0"
+#  netmask: "255.255.255.0"
+#  routers: "192.168.13.1"
+#  dns_servers: "{{ ipv4_dns_servers }}"
+#  range_start: 192.168.13.100
+#  range_end: 192.168.13.120
+
+cobbler_dhcp:
+  subnet: 
+  netmask: 
+  routers: 
+  dns_servers: "{{ ipv4_dns_servers }}"
+  range_start: 
+  range_end: 
+
+#
+# Cobbler TFTP xinetd service config
+
+# See xinetd role to get more info about the format.
+
+cobbler_xinetd_service_tftp:
+  name: tftp
+  package: tftp-server
+  disable: no
+  socket_type: dgram
+  protocol: udp
+  wait: yes
+  user: root
+  server: /usr/sbin/in.tftpd
+  server_args: "-B 1380 -v -s /var/lib/tftpboot"
+  per_source: 11
+  cps: "100 2"
+  flags: IPv4
+
+#
+# Cobbler RSYNC xinetd config
+#
+
+# See xinetd role to get more info about the format.
+
+cobbler_xinetd_service_rsync:
+  name: rsync
+  package: rsync
+  disable: no
+  socket_type: stream
+  wait: no
+  user: root
+  server: /usr/bin/rsync
+  server_args: --daemon
+  log_on_failure_operator: "+="
+  log_on_failure: USERID
+
+#
+# List of cobbler distros to manage. 
+#
+
+# Format of the list items:
+#
+#  - name: name of the distro
+#    iso_file: name of the iso file without path
+#    iso_url: http iso url without the filename
+#    iso_md5sum: md5sum of the iso file
+#
+# Samples:
+#
+#  - name: CentOS-6-x86_64
+#    iso_file: CentOS-6.7-x86_64-minimal.iso
+#    iso_url: "http://ftp.cixug.es/CentOS/6/isos/x86_64"
+#    iso_md5sum: "9381a24b8bee2fed0c26896141a64b69"
+#
+#  - name: CentOS-7-x86_64
+#    iso_file: CentOS-7-x86_64-Minimal-1511.iso
+#    iso_url: "http://ftp.cixug.es/CentOS/7/isos/x86_64"
+#    iso_md5sum: "88c0437f0a14c6e2c94426df9d43cd67"
+
+cobbler_distros:
+
+#
+# List of cobbler profiles to manage.
+#
+
+# Format of the list items:
+#
+#  - name: name of the profile
+#    distro: name of the distro (must much with one of the defined distros)
+#    kickstart: full path to the kickstart file for the profile
+#
+# Samples:
+#
+#  - name: CentOS-6-x86_64
+#    distro: CentOS-6-x86_64
+#    kickstart: /var/lib/cobbler/kickstarts/centos6.ks
+#
+#  - name: CentOS-7-x86_64
+#    distro: CentOS-7-x86_64
+#    kickstart: /var/lib/cobbler/kickstarts/centos7.ks
+
+cobbler_profiles:
