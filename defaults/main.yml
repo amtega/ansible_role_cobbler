@@ -8,7 +8,7 @@
 cobbler_default_password_crypted: "$1$hZtCu.xn$OcfOoLF7907a.3rd73PqK1"
 cobbler_next_server: "{{ ansible_default_ipv4.address }}"
 cobbler_server: "{{ ansible_default_ipv4.address }}"
-cobbler_proxy_url_ext: "{{ http_proxy_url }}"
+cobbler_proxy_url_ext: "{{ INTERNET_HTTP_PROXY_URL }}"
 cobbler_config_dir: /var/lib/cobbler/config
 cobbler_tmp_dir: /var/www/cobbler/tmp
 cobbler_iso_dir: "{{ cobbler_tmp_dir }}/iso"
@@ -31,7 +31,7 @@ cobbler_iso_dir: "{{ cobbler_tmp_dir }}/iso"
 #  subnet: "192.168.13.0"
 #  netmask: "255.255.255.0"
 #  routers: "192.168.13.1"
-#  dns_servers: "{{ ipv4_dns_servers }}"
+#  dns_servers: "{{ NETWORK_IPV4_DNS_SERVERS }}"
 #  range_start: 192.168.13.100
 #  range_end: 192.168.13.120
 
@@ -39,7 +39,7 @@ cobbler_dhcp:
   subnet: 
   netmask: 
   routers: 
-  dns_servers: "{{ ipv4_dns_servers }}"
+  dns_servers: "{{ NETWORK_IPV4_DNS_SERVERS }}"
   range_start: 
   range_end: 
 
