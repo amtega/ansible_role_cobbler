@@ -1,0 +1,91 @@
+---
+# Configure distros tasks
+
+- block:
+
+  #
+  # Read cobbler current distros config
+  #
+
+  - name: read actual distros config
+    command: cat "{{ item }}"
+    with_fileglob: "{{ cobbler_config_dir }}/distros.d/*"
+    register: cobbler_read_distros_config_result
+    changed_when: false
+
+  - name: setup facts with distros config info
+    set_fact:
+      cobbler_distros_config_json: >-
+        [ {% for item in cobbler_read_distros_config_result.results
+                           | default([]) %}
+          {{ item.stdout }}
+          {% if not loop.last %},{% endif %}
+        {% endfor %} ]
+
+      cobbler_distros_config: >-
+        {{ cobbler_distros_config_json | from_json }}
+
+      cobbler_distros: >-
+        {{ cobbler_distros_config | map(attribute='name') | list }}
+    changed_when: false
+
+  - name: delete distros not managed by ansible
+    command: cobbler distro remove --name={{ item }} --recursive
+    when:
+      - cobbler_delete_unmanaged
+      - '{{ item }}' not in cobbler_distros
+    with_items: "{{ cobbler_distros }}"
+
+  - name: delete distros with different iso md5sum
+    command: cobbler distro remove --name={{ item.name }} --recursive
+    when: >
+      item.ks_meta.iso_md5sum
+        not in cobbler_distros_config
+          | selectattr('name', 'equalto', item.name)
+          | map(attribute='iso_md5sum') | list
+    with_items: "{{ cobbler_distros_config }}"
+
+  - name: import distros
+    command: >-
+      cobbler import
+        --name={{ cobbler_distros_config
+                    | selectattr('iso_file', 'equalto', item
+                    | basename) | map(attribute='name') | list | first }}
+        --path={{ cobbler_iso_dir }}/mounted/{{ item | basename }}"
+    with_fileglob: "{{ cobbler_iso_dir }}/*"
+    when: >
+      cobbler_distros | selectattr('iso_file', 'equalto', item | basename) | map(attribute='name') | list | first
+        not in cobbler_distros
+
+  - name: add ksmeta attributes to imported distros
+    command: "cobbler distro edit --name={{ cobbler_distros | selectattr('iso_file', 'equalto', item | basename) | map(attribute='name') | list | first }}
+                                  --ksmeta='iso_file={{ cobbler_distros | selectattr('iso_file', 'equalto', item | basename) | map(attribute='iso_file') | list | first }},
+                                            iso_md5sum={{ cobbler_distros | selectattr('iso_file', 'equalto', item | basename) | map(attribute='iso_md5sum') | list | first }}'"
+    with_fileglob: "{{ cobbler_iso_dir }}/*"
+    when: "'{{ cobbler_distros | selectattr('iso_file', 'equalto', item | basename) | map(attribute='name') | list | first }}' not in cobbler_actual_distros"
+
+  - name: delete default profiles created during distro import
+    command: cobbler profile remove --name={{ cobbler_distros | selectattr('iso_file', 'equalto', item | basename) | map(attribute='name') | list | first }} --recursive
+    when: "'{{ cobbler_distros | selectattr('iso_file', 'equalto', item | basename) | map(attribute='name') | list | first }}' not in cobbler_actual_distros"
+    with_fileglob: "{{ cobbler_iso_dir }}/*"
+
+  - name: umount ISOs out of temporary dirs
+    mount: fstype=iso9660 opts="loop,ro" src={{ item }} name={{ cobbler_iso_dir }}/mounted/{{ item | basename }} state=unmounted
+    with_fileglob: "{{ cobbler_iso_dir }}/*"
+
+  - name: get list of ISOs temporary dirs
+    command: find "{{ cobbler_iso_dir }}/mounted" -maxdepth 1 -mindepth 1 -type d
+    register: find_iso_tmpdirs_result
+    changed_when: false
+
+  - name: remove ISOs temporary dirs
+    file: path="{{ item }}" state=absent
+    with_items: "{{ find_iso_tmpdirs_result.stdout_lines }}"
+
+  - name: delete downloaded ISOs
+    file: path="{{ item }}" state=absent
+    with_fileglob: "{{ cobbler_iso_dir }}/*"
+
+tags:
+  - role::dhcpd
+  - role::dhcpd::configure

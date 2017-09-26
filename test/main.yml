@@ -1,0 +1,22 @@
+---
+---
+
+- name: run idempotence test
+  hosts: localhost
+  roles:
+    - role: docker_presets
+    - role: docker_sandbox
+      docker_sandbox_state: started
+
+- name: test cobbler role
+  hosts: docker_sandbox_containers
+  roles:
+    - cobbler
+  tags:
+    - idempotence
+
+- name: cleanup docker docker sandbox
+  hosts: localhost
+  roles:
+    - role: docker_sandbox
+      docker_sandbox_state: absent

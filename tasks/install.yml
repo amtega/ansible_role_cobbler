@@ -1,0 +1,38 @@
+---
+# Install tasks
+
+- name: install packages needed by clobber
+  pacakge:
+    name: "{{ item  }}2
+    state: present
+  with_items: "{{ cobbler_packages | default([]) }}"
+  tags:
+    - role::cobbler
+    - role::cobbler::packages
+    - role::cobbler::install
+
+- block:
+
+  - name: create config directories
+    file:
+      path: "{{ item }}"
+      state: directory
+      owner: root
+      group: root
+      mode: 0755
+      with_items:
+      - "{{ cobbler_tmp_dir }}"
+      - "{{ cobbler_iso_dir }}"
+      - "{{ cobbler_iso_dir }}/mounted"
+
+  - name: download cobbler loaders
+    command: cobbler get-loaders
+    environment:
+      http_proxy: "{{ cobbler_internet_proxy_http }}"
+      https_proxy: "{{ cobbler_internet_proxy_https }}"
+    register: cobbler_rsync_result
+    changed_when: "'downloading ' in cobbler_rsync_result.stdout"
+
+  tags:
+    - role::cobbler
+    - role::cobbler::install

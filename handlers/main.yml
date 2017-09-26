@@ -1,9 +1,10 @@
 ---
 # Role handlers
 
-#
-# Synchronize cobbler
-#
-
-- name: synchronize cobbler
+- name: cobbler synchronize
   command: cobbler sync
+  listen:
+    - synchronize cobbler
+  tags:
+    - role::cobbler
+    - role::cobbler::service

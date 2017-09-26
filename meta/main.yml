@@ -1,6 +1,60 @@
 ---
 # Role dependencies
 
+galaxy_info:
+  author: Juan Antonio Valiño García
+  description: Setup docker engine
+  company: Amtega - Xunta de Galicia
+  license: license not defined
+  min_ansible_version: 2.3
+  platforms:
+  - name: Fedora
+    versions:
+    - 25
+  - name: EL
+    versions:
+    - 6
+    - 7
+  galaxy_tags:
+    - cobbler
+
 dependencies:
-  - { role: enterprise_linux }
-  - { role: xinetd,  xinetd_service: "{{ cobbler_xinetd_service_rsync }}" }
+  - role: gnu_linux
+
+  - role: selinux
+    selinux_mode: disabled
+
+  - role: dhcpd
+    dhcpd_subnet_addresses: "{{ cobbler_dhcpd_subnet_addresses }}"
+    when: cobbler_dhcpd_subnet_addresses | default([]) | length > 0
+
+  - role: xinetd
+
+  - role: xinetd_service
+    xinetd_service_name: "{{ cobbler_xinetd_service_rsync_name }}"
+    xinetd_service_id: "{{ cobbler_xinetd_service_rsync_id }}"
+    xinetd_service_package: "{{ cobbler_xinetd_service_rsync_package }}"
+    xinetd_service_disable: "{{ cobbler_xinetd_service_rsync_disable }}"
+    xinetd_service_socket_type: "{{ cobbler_xinetd_service_rsync_socket_type }}"
+    xinetd_service_protocol: "{{ cobbler_xinetd_service_rsync_protocol }}"
+    xinetd_service_wait: "{{ cobbler_xinetd_service_rsync_wait }}"
+    xinetd_service_user: "{{ cobbler_xinetd_service_rsync_user }}"
+    xinetd_service_server: "{{ cobbler_xinetd_service_rsync_server }}"
+    xinetd_service_server_args: "{{ cobbler_xinetd_service_rsync_server_args }}"
+    xinetd_service_log_on_failure: >-
+      {{ cobbler_xinetd_service_rsync_log_on_failure }}
+
+  - role: xinetd_service
+    xinetd_service_name: "{{ cobbler_xinetd_service_tftp_name }}"
+    xinetd_service_id: "{{ cobbler_xinetd_service_tftp_id }}"
+    xinetd_service_package: "{{ cobbler_xinetd_service_tftp_package }}"
+    xinetd_service_disable: "{{ cobbler_xinetd_service_tftp_disable }}"
+    xinetd_service_socket_type: "{{ cobbler_xinetd_service_tftp_socket_type }}"
+    xinetd_service_protocol: "{{ cobbler_xinetd_service_tftp_protocol }}"
+    xinetd_service_wait: "{{ cobbler_xinetd_service_tftp_wait }}"
+    xinetd_service_user: "{{ cobbler_xinetd_service_tftp_user }}"
+    xinetd_service_server: "{{ cobbler_xinetd_service_tftp_server }}"
+    xinetd_service_server_args: "{{ cobbler_xinetd_service_tftp_server_args }}"
+    xinetd_service_per_source: "{{ cobbler_xinetd_service_tftp_per_source }}"
+    xinetd_service_cps: "{{ cobbler_xinetd_service_tftp_cps }}"
+    xinetd_service_flags: "{{ cobbler_xinetd_service_tftp_flags }}"

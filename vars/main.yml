@@ -1,2 +1,12 @@
 ---
 # Role variables
+
+# Packages required by cobbler service
+
+cobbler_packages:
+  - cobbler
+  - dhcp
+  - debmirror
+  - cman
+  - fence-agents
+  - tftp-server

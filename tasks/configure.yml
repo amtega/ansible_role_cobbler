@@ -1,27 +1,5 @@
 ---
-# Role tasks
-
-- name: install clobber
-  include: install.yml
-  static: false
-  tags:
-    - role::clobber
-    - role::clobber::install
-
-- name: configure clobber
-  include: configure.yml
-  static: false
-  tags:
-    - role::dhcpd
-    - role::dhcpd::configure
-
-- name: setup dhcpd clobber
-  include: service.yml
-  static: false
-  tags:
-    - role::clobber
-    - role::clobber::service
-
+# Configuration tasks
 
 #
 # Cobbler configuration tasks
@@ -29,37 +7,15 @@
 
 - block:
 
-  #
-  # Setup cobbler config files
-  #
+  - name: configure clobber settings
+    include: configure_settings.yml
+    static: false
+    tags:
+      - role::dhcpd
+      - role::dhcpd::configure
+      - role::dhcpd::configure::settings
 
-  - name: configure /etc/cobbler/settings
-    template: src=settings.j2 dest=/etc/cobbler/settings owner=root group=root mode=0644 backup=yes
-    notify:
-      - synchronize cobbler
 
-  - name: configure /etc/cobbler/dhcp.template
-    template: src=dhcp.template.j2 dest=/etc/cobbler/dhcp.template owner=root group=root mode=0644 backup=yes
-    notify:
-      - synchronize cobbler
-
-  - name: configure /etc/cobbler/modules.conf
-    template: src=modules.conf.j2 dest=/etc/cobbler/modules.conf owner=root group=root mode=0644 backup=yes
-    notify:
-      - synchronize cobbler
-
-  - name: configure /etc/debmirror.conf
-    template: src=debmirror.conf.j2 dest=/etc/debmirror.conf owner=root group=root mode=0644 backup=yes
-    notify:
-      - synchronize cobbler
-
-  - name: disable selinux
-    selinux: state=disabled
-    register: selinux_disable_result
-    notify:
-      - restart machine
-
-  - meta: flush_handlers
 
   #
   # Read cobbler current distros / profiles config
@@ -187,32 +143,6 @@
     file: path="{{ item }}" state=absent
     with_fileglob: "{{ cobbler_iso_dir }}/*"
 
-  tags: configure
-
-#
-# Cobbler service tasks
-#
-
-- block:
-
-  #
-  # Enable cobbler and dhcp services
-  #
-
-  - name: enable and start cobblerd service
-    service: name=cobblerd state=started enabled=yes
-
-  - name: enable and start dhcpd service
-    service: name=dhcpd state=started enabled=yes
-
-  #
-  # Check cobbler
-  #
-
-  - name: check cobbler
-    command: cobbler check
-    register: cobbler_check_result
-    failed_when: "'No configuration problems found' not in cobbler_check_result.stdout"
-    changed_when: "false"
-
-  tags: service
+tags:
+  - role::dhcpd
+  - role::dhcpd::configure
