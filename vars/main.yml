@@ -5,7 +5,6 @@
 
 cobbler_packages:
   - cobbler
-  - dhcp
   - debmirror
   - cman
   - fence-agents

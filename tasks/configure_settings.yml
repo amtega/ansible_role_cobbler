@@ -21,6 +21,6 @@
   - meta: flush_handlers
 
   tags:
-    - role::dhcpd
-    - role::dhcpd::configure
-    - role::dhcpd::configure::settings
+    - role::cobbler
+    - role::cobbler::configure
+    - role::cobbler::configure::settings

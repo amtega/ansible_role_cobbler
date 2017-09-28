@@ -1,2 +1,21 @@
 ---
 # Service tasks
+
+- block:
+
+  - name: enable and start cobblerd service
+    service:
+      name: cobblerd
+      state: started
+      enabled: yes
+
+  - name: check cobbler
+    command: cobbler check
+    register: cobbler_check_result
+    failed_when: >
+      'No configuration problems found' not in cobbler_check_result.stdout
+    changed_when: false
+
+tags:
+  - role::clobber
+  - role::clobber::service

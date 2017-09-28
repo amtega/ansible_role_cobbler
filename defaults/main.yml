@@ -15,13 +15,6 @@ cobbler_internet_proxy_http: "{{ gnu_linux_internet_proxy_http }}"
 cobbler_internet_proxy_https: "{{ gnu_linux_internet_proxy_https }}"
 
 #
-# Cobbler DHCP config
-# See dhcpd role to get more info about the format.
-#
-
-cobbler_dhcpd_subnet_addresses:
-
-#
 # Cobbler TFTP xinetd service config
 # See xinetd role to get more info about the format.
 #
@@ -39,23 +32,6 @@ cobbler_xinetd_service_tftp_server_args: "-B 1380 -v -s /var/lib/tftpboot"
 cobbler_xinetd_service_tftp_per_source: 11
 cobbler_xinetd_service_tftp_cps: "100 2"
 cobbler_xinetd_service_tftp_flags: IPv4
-
-#
-# Cobbler RSYNC xinetd config
-# See xinetd role to get more info about the format.
-#
-
-cobbler_xinetd_service_rsync_name: rsync
-cobbler_xinetd_service_rsync_id: rsync
-cobbler_xinetd_service_rsync_package: rsync
-cobbler_xinetd_service_rsync_disable: no
-cobbler_xinetd_service_rsync_socket_type: stream
-cobbler_xinetd_service_rsync_protocol: tcp
-cobbler_xinetd_service_rsync_wait: no
-cobbler_xinetd_service_rsync_user: root
-cobbler_xinetd_service_rsync_server: /usr/bin/rsync
-cobbler_xinetd_service_rsync_server_args: --daemon
-cobbler_xinetd_service_rsync_log_on_failure: USERID
 
 #
 # List of cobbler distros to manage.

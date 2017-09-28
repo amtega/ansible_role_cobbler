@@ -1,5 +1,4 @@
 ---
----
 
 - name: run idempotence test
   hosts: localhost
@@ -7,11 +6,32 @@
     - role: docker_presets
     - role: docker_sandbox
       docker_sandbox_state: started
+      docker_sandbox_idempotence_test: false
 
 - name: test cobbler role
   hosts: docker_sandbox_containers
   roles:
     - cobbler
+  vars:
+    cobbler_distros:
+      - name: CentOS-6-x86_64
+        iso_file: CentOS-6.7-x86_64-minimal.iso
+        iso_url: "http://ftp.cixug.es/CentOS/6/isos/x86_64"
+        iso_md5sum: "9381a24b8bee2fed0c26896141a64b69"
+
+      - name: CentOS-7-x86_64
+        iso_file: CentOS-7-x86_64-Minimal-1511.iso
+        iso_url: "http://ftp.cixug.es/CentOS/7/isos/x86_64"
+        iso_md5sum: "88c0437f0a14c6e2c94426df9d43cd67"
+
+    cobbler_profiles:
+      - name: CentOS-6-x86_64
+        distro: CentOS-6-x86_64
+        kickstart: /var/lib/cobbler/kickstarts/centos6.ks
+
+      - name: CentOS-7-x86_64
+        distro: CentOS-7-x86_64
+        kickstart: /var/lib/cobbler/kickstarts/centos7.ks
   tags:
     - idempotence
 

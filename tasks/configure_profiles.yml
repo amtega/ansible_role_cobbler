@@ -1,0 +1,19 @@
+---
+# Configure profiles tasks
+
+- block:
+
+  - name: get list of profiles
+    command: cobbler profile list | awk '{ print $1 }'
+    register: cobbler_profile_list_result
+    changed_when: false
+
+  - name: delete profiles not managed by ansible
+    command: cobbler profile remove --name={{ item }} --recursive
+    when: item not in cobbler_profiles | map(attribute='name') | list
+    with_items: "{{ cobbler_profile_list_result.stdout_lines }}"
+
+tags:
+  - role::cobbler
+  - role::cobbler::configure
+  - role::cobbler::configure::profiles
