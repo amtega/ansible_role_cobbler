@@ -20,6 +20,8 @@ galaxy_info:
 
 dependencies:
   - role: gnu_linux
+
+  - role: epel_repository
   #
   # - role: selinux
   #   selinux_mode: disabled

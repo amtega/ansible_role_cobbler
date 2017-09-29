@@ -1,23 +1,20 @@
 ---
 # Role tasks
 
-- name: install clobber
-  include: install.yml
-  static: false
+- name: install cobbler
+  include_tasks: install.yml
   tags:
-    - role::clobber
-    - role::clobber::install
+    - role::cobbler
+    - role::cobbler::install
 
-- name: configure clobber
-  include: configure.yml
-  static: false
+- name: configure cobbler
+  include_tasks: configure.yml
   tags:
-    - role::clobber
-    - role::clobber::configure
+    - role::cobbler
+    - role::cobbler::configure
 
-- name: setup clobber clobber
-  include: service.yml
-  static: false
+- name: setup cobbler cobbler
+  include_tasks: service.yml
   tags:
-    - role::clobber
-    - role::clobber::service
+    - role::cobbler
+    - role::cobbler::service

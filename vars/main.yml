@@ -6,6 +6,5 @@
 cobbler_packages:
   - cobbler
   - debmirror
-  - cman
-  - fence-agents
   - tftp-server
+  - httpd

@@ -1,12 +1,12 @@
 ---
 
-- name: run idempotence test
-  hosts: localhost
-  roles:
-    - role: docker_presets
-    - role: docker_sandbox
-      docker_sandbox_state: started
-      docker_sandbox_idempotence_test: false
+# - name: run idempotence test
+#   hosts: localhost
+#   roles:
+#     - role: docker_presets
+#     - role: docker_sandbox
+#       docker_sandbox_state: started
+#       docker_sandbox_idempotence_test: false
 
 - name: test cobbler role
   hosts: docker_sandbox_containers
@@ -15,14 +15,18 @@
   vars:
     cobbler_distros:
       - name: CentOS-6-x86_64
-        iso_file: CentOS-6.7-x86_64-minimal.iso
+        iso_file: CentOS-6.9-x86_64-minimal.iso
         iso_url: "http://ftp.cixug.es/CentOS/6/isos/x86_64"
-        iso_md5sum: "9381a24b8bee2fed0c26896141a64b69"
+        iso_checksum: "af4a1640c0c6f348c6c41f1ea9e192a2"
+        iso_checksum_algorithm: md5
+        state: present
 
       - name: CentOS-7-x86_64
-        iso_file: CentOS-7-x86_64-Minimal-1511.iso
+        iso_file: CentOS-7-x86_64-Minimal-1708.iso
         iso_url: "http://ftp.cixug.es/CentOS/7/isos/x86_64"
-        iso_md5sum: "88c0437f0a14c6e2c94426df9d43cd67"
+        iso_checksum: "aae20c8052a55cf179af88d9dd35f1a889cd5773"
+        iso_checksum_algorithm: sha1
+        state: present
 
     cobbler_profiles:
       - name: CentOS-6-x86_64
@@ -35,8 +39,8 @@
   tags:
     - idempotence
 
-- name: cleanup docker docker sandbox
-  hosts: localhost
-  roles:
-    - role: docker_sandbox
-      docker_sandbox_state: absent
+# - name: cleanup docker docker sandbox
+#   hosts: localhost
+#   roles:
+#     - role: docker_sandbox
+#       docker_sandbox_state: absent

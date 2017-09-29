@@ -9,6 +9,14 @@
       state: started
       enabled: yes
 
+  - name: download cobbler loaders
+    command: cobbler get-loaders
+    environment:
+      http_proxy: "{{ cobbler_internet_proxy_http }}"
+      https_proxy: "{{ cobbler_internet_proxy_https }}"
+    register: cobbler_rsync_result
+    changed_when: "'downloading ' in cobbler_rsync_result.stdout"
+
   - name: check cobbler
     command: cobbler check
     register: cobbler_check_result
@@ -17,5 +25,5 @@
     changed_when: false
 
 tags:
-  - role::clobber
-  - role::clobber::service
+  - role::cobbler
+  - role::cobbler::service

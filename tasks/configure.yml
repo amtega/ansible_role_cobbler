@@ -1,25 +1,22 @@
 ---
 # Configuration tasks
 
-- name: configure clobber settings
-  include: configure_settings.yml
-  static: false
+- name: configure cobbler settings
+  include_tasks: configure_settings.yml
   tags:
     - role::cobbler
     - role::cobbler::configure
     - role::cobbler::configure::settings
 
-- name: configure clobber distros
-  include: configure_distros.yml
-  static: false
+- name: configure cobbler distros
+  include_tasks: configure_distros.yml
   tags:
     - role::cobbler
     - role::cobbler::configure
     - role::cobbler::configure::distros
 
-- name: configure clobber profles
-  include: configure_profiles.yml
-  static: false
+- name: configure cobbler profles
+  include_tasks: configure_profiles.yml
   tags:
     - role::cobbler
     - role::cobbler::configure

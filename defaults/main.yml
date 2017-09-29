@@ -42,19 +42,22 @@ cobbler_xinetd_service_tftp_flags: IPv4
 #  - name: name of the distro
 #    iso_file: name of the iso file without path
 #    iso_url: http iso url without the filename
-#    iso_md5sum: md5sum of the iso file
+#    iso_checksum: the checksum of the iso file
+#    iso_checksum_algorithm: md5 or sha1
 #
 # Samples:
 #
 #  - name: CentOS-6-x86_64
 #    iso_file: CentOS-6.7-x86_64-minimal.iso
 #    iso_url: "http://ftp.cixug.es/CentOS/6/isos/x86_64"
-#    iso_md5sum: "9381a24b8bee2fed0c26896141a64b69"
+#    iso_checksum: "9381a24b8bee2fed0c26896141a64b69"
+#    iso_checksum_algorithm: md5
 #
 #  - name: CentOS-7-x86_64
 #    iso_file: CentOS-7-x86_64-Minimal-1511.iso
 #    iso_url: "http://ftp.cixug.es/CentOS/7/isos/x86_64"
-#    iso_md5sum: "88c0437f0a14c6e2c94426df9d43cd67"
+#    iso_checksum: "88c0437f0a14c6e2c94426df9d43cd67"
+#    iso_checksum_algorithm: md5
 
 cobbler_distros:
 
@@ -67,16 +70,19 @@ cobbler_distros:
 #  - name: name of the profile
 #    distro: name of the distro (must much with one of the defined distros)
 #    kickstart: full path to the kickstart file for the profile
+#    state: present or absent
 #
 # Samples:
 #
 #  - name: CentOS-6-x86_64
 #    distro: CentOS-6-x86_64
 #    kickstart: /var/lib/cobbler/kickstarts/centos6.ks
+#    state: present
 #
 #  - name: CentOS-7-x86_64
 #    distro: CentOS-7-x86_64
 #    kickstart: /var/lib/cobbler/kickstarts/centos7.ks
+#    state: present
 
 cobbler_profiles:
 
