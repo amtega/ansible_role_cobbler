@@ -6,5 +6,9 @@
 cobbler_packages:
   - cobbler
   - debmirror
-  - tftp-server
   - httpd
+  - tftp-server
+
+# Base directory to temporary mount ISOs
+
+cobbler_iso_mount_dir: "{{ cobbler_iso_dir }}/mounted"

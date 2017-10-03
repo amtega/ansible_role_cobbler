@@ -23,7 +23,7 @@
     with_items:
       - "{{ cobbler_tmp_dir }}"
       - "{{ cobbler_iso_dir }}"
-      - "{{ cobbler_iso_dir }}/mounted"
+      - "{{ cobbler_iso_mount_dir }}"
 
   tags:
     - role::cobbler
