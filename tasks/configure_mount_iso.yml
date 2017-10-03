@@ -24,7 +24,8 @@
       b
       7
       {{ cobbler_losetup_result.stdout | regex_replace("/dev/loop", "") }}
-    creates: "{{ cobbler_losetup_result.stdout }}"
+    args:
+      creates: "{{ cobbler_losetup_result.stdout }}"
     register: cobbler_mknod_result
     failed_when: cobbler_mknod_result.rc != 0
 
