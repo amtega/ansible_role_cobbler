@@ -36,8 +36,6 @@
     notify:
       - synchronize cobbler
 
-  - meta: flush_handlers
-
   tags:
     - role::cobbler
     - role::cobbler::configure

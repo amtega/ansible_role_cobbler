@@ -7,6 +7,7 @@
 #     - role: docker_sandbox
 #       docker_sandbox_state: started
 #       docker_sandbox_idempotence_test: false
+#       docker_provisioner_container_privileged: true
 
 - name: test cobbler role
   hosts: docker_sandbox_containers

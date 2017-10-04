@@ -15,9 +15,9 @@
     - role::cobbler::configure
     - role::cobbler::configure::distros
 
-- name: configure cobbler profles
-  include_tasks: configure_profiles.yml
-  tags:
-    - role::cobbler
-    - role::cobbler::configure
-    - role::cobbler::configure::profiles
+# - name: configure cobbler profles
+#   include_tasks: configure_profiles.yml
+#   tags:
+#     - role::cobbler
+#     - role::cobbler::configure
+#     - role::cobbler::configure::profiles
