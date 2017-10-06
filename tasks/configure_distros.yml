@@ -23,26 +23,27 @@
   #         | list
   #   with_items: "{{ cobbler_distros_config }}"
   #
-  # - name: search ISO files
-  #   find:
-  #     paths: "{{ cobbler_iso_dir }}"
-  #     file_type: file
-  #   register: cobbler_search_iso_files_result
-  #
-  # - name: delete ISOs not managed by ansible
-  #   file:
-  #     path: "{{ item }}"
-  #     state: absent
-  #   when: >
-  #     item | basename
-  #       not in cobbler_distros_config | map(attribute='iso_file') | list
-  #       and cobbler_delete_unmanaged
-  #   with_items: >-
-  #     {{ cobbler_search_iso_files_result.files
-  #         | map(attribute="path")
-  #         | list }}
-  #
+  - name: search ISO files
+    find:
+      paths: "{{ cobbler_iso_dir }}"
+      file_type: file
+    register: cobbler_search_iso_files_result
 
+  - name: delete ISOs not managed by ansible
+    file:
+      path: "{{ item }}"
+      state: absent
+    when: >
+      cobbler_delete_unmanaged
+      and item | basename
+        not in cobbler_distros
+          | selectattr('state', 'equalto', 'present')
+          | map(attribute='iso_file')
+          | list
+    with_items: >-
+      {{ cobbler_search_iso_files_result.files
+          | map(attribute="path")
+          | list }}
 
   - name: find stalled mounted ISOs dirs
     command: >-
@@ -58,25 +59,24 @@
       state: unmounted
     with_items: "{{ cobbler_find_stalled_iso_tmp_dirs_result.stdout_lines }}"
 
-
-
-
-  # - name: download ISOs
-  #   get_url:
-  #     url: "{{ item.iso_url }}/{{ item.iso_file }}"
-  #     dest: "{{ cobbler_iso_dir }}/{{ item.iso_file }}"
-  #     checksum: "{{ item.iso_checksum_algorithm }}:{{ item.iso_checksum }}"
-  #     force: yes
-  #     timeout: 60
-  #   when: >
-  #     item.state == "present"
-  #     and item.name not in cobbler_distros_present_names
-  #     or item.iso_checksum not in cobbler_distros_config
-  #                                 | selectattr('name', 'equalto', item.name)
-  #                                 | map(attribute='ks_meta')
-  #                                 | map(attribute='iso_checksum') | list
-  #   with_items: "{{ cobbler_distros }}"
-  #   register: cobbler_download_distros_result
+  - name: download ISOs
+    get_url:
+      url: "{{ item.iso_url }}/{{ item.iso_file }}"
+      dest: "{{ cobbler_iso_dir }}/{{ item.iso_file }}"
+      checksum: "{{ item.iso_checksum_algorithm }}:{{ item.iso_checksum }}"
+      force: yes
+      timeout: 60
+    when: >
+      item.state == "present"
+      and item.name not in cobbler_distros_present_names
+      or item.iso_checksum not in cobbler_distros_config
+                                  | selectattr('name', 'equalto', item.name)
+                                  | map(attribute='ks_meta')
+                                  | map(attribute='iso_checksum') | list
+    register: cobbler_download_distros_result
+    with_items: "{{ cobbler_distros }}"
+    loop_control:
+      label: "{{ item.iso_url + '/' + item.iso_file }}"
 
   - name: search downloaded ISO files
     find:
@@ -84,37 +84,62 @@
       file_type: file
     register: cobbler_search_iso_files_result
 
-  - name: mount ISOs in temporary dirs
-    include_tasks: configure_iso_mount.yml
-    vars:
-      cobbler_iso_file: "{{ item }}"
+  - name: create temporary mount dirs for ISOs
+    file:
+      path: "{{ cobbler_iso_mount_dir }}/{{ item | basename }}"
+      state: directory
+      owner: root
+      group: root
+      mode: 0755
     with_items: >-
       {{ cobbler_search_iso_files_result.files
           | map(attribute="path")
           | list }}
 
-  # - name: import distros
-  #   command: >-
-  #     cobbler import
-  #     --name={{ cobbler_distros_config
-  #                 | selectattr('iso_file', 'equalto', item | basename)
-  #                 | map(attribute='name')
-  #                 | list
-  #                 | first }}
-  #     --path={{ cobbler_iso_mount_dir }}/{{ item | basename }}
-  #   when: >
-  #     cobbler_distros
-  #     | selectattr('iso_file', 'equalto', item | basename)
-  #     | map(attribute='name')
-  #     | list
-  #     | first
-  #     not in cobbler_distros
-  #   with_items: >-
-  #     {{ cobbler_search_iso_files_result.files
-  #         | map(attribute="path")
-  #         | list }}
-  #
-  # - name: add ksmeta attributes to imported distros
+  - name: mount ISO in temporary dir
+    mount:
+      fstype: iso9660
+      opts: "loop,ro"
+      src: "{{ item }}"
+      path: "{{ cobbler_iso_mount_dir }}/{{ item | basename }}"
+      state: mounted
+    with_items: >-
+      {{ cobbler_search_iso_files_result.files
+          | map(attribute="path")
+          | list }}
+
+  - name: import distros
+    command: >-
+      cobbler import
+      --name={{ cobbler_distros
+                  | selectattr('iso_file', 'equalto', item | basename)
+                  | map(attribute='name')
+                  | list
+                  | first }}
+      --path={{ cobbler_iso_mount_dir }}/{{ item | basename }}
+    when: >
+      cobbler_distros
+      | selectattr('iso_file', 'equalto', item | basename)
+      | map(attribute='name')
+      | list
+      | first
+      not in cobbler_distros_present_names
+    with_items: >-
+      {{ cobbler_search_iso_files_result.files
+          | map(attribute="path")
+          | list }}
+
+  # - name: add ksmeta attributes to im- name: search last used loopback device number
+    # shell: >-
+    #   losetup -a
+    #   | cut -f1 -d':'
+    #   | tail -1
+    #   | sed -r 's#.*([0-9]+)#\1#g'
+    # register: cobbler_losetup_result
+    # failed_when: cobbler_losetup_result.rc != 0
+    # changed_when: false
+
+
   #   command: >-
   #     cobbler distro edit
   #     --name={{ cobbler_distros_config

@@ -9,25 +9,83 @@
 #       docker_sandbox_idempotence_test: false
 #       docker_provisioner_container_privileged: true
 
+- name: retrieve distos ISO information
+  hosts: localhost
+  tasks:
+    - name: setup base urls for CentOS download
+      set_fact:
+        centos_6_baseurl: http://ftp.cixug.es/CentOS/6/isos/x86_64
+        centos_7_baseurl: http://ftp.cixug.es/CentOS/7/isos/x86_64
+
+    - name: setup facts with info to to download sha1 files
+      set_fact:
+        sha1sum_files:
+          - url: "{{ centos_6_baseurl }}"
+            sha1sum: "sha1sum.txt"
+            dest: "{{ playbook_dir }}/CentOS-6-x86_64"
+
+          - url: "{{ centos_7_baseurl }}"
+            sha1sum: "sha1sum.txt"
+            dest: "{{ playbook_dir }}/CentOS-7-x86_64"
+
+    - name: download sha1 files
+      get_url:
+        url: "{{ item.url }}/{{ item.sha1sum }}"
+        dest: "{{ item.dest }}"
+        force: yes
+        timeout: 60
+      with_items: "{{ sha1sum_files }}"
+      loop_control:
+        label: "{{ item.dest }}"
+
+    - name: parse sha1 files
+      set_fact:
+        iso:
+          - name: "{{ item.dest }}"
+            iso_file: >-
+              {{ lookup("pipe",
+                        "sed -r 's# +# #g' "
+                        + item.dest
+                        + "| grep [Mm]inimal"
+                        + "| cut -f 2 -d' '" ) }}
+            iso_url: "{{ item.url }}"
+            iso_checksum: >-
+                {{ lookup("pipe",
+                          "sed -r 's# +# #g' "
+                          + item.dest
+                          + "| grep [Mm]inimal"
+                          + "| cut -f 1 -d' '" ) }}
+            iso_checksum_algorithm: sha1
+            state: present
+      register: sha1_parse_result
+      with_items: "{{ sha1sum_files }}"
+      loop_control:
+        label: "{{ item.dest }}"
+
+    - name: build cobbler_distros fact
+      set_fact:
+        cobbler_distros: >-
+          {{ sha1_parse_result.results
+              | map(attribute="ansible_facts")
+              | sum("iso", [])
+              | list }}
+
+  tags:
+    - role::cobbler::configure::distros
+
+
 - name: test cobbler role
   hosts: docker_sandbox_containers
-  roles:
-    - cobbler
   vars:
-    cobbler_distros:
-      # - name: CentOS-6-x86_64
-      #   iso_file: CentOS-6.9-x86_64-minimal.iso
-      #   iso_url: "http://ftp.cixug.es/CentOS/6/isos/x86_64"
-      #   iso_checksum: "af4a1640c0c6f348c6c41f1ea9e192a2"
-      #   iso_checksum_algorithm: md5
-      #   state: present
+    loop_device_pattern:
+      state: present
+      path: "/dev/loop{n}"
+      type: block
+      major: 7
+      minor: "{n}"
+      mode: "0660"
 
-      - name: CentOS-7-x86_64
-        iso_file: CentOS-7-x86_64-Minimal-1708.iso
-        iso_url: "http://ftp.cixug.es/CentOS/7/isos/x86_64"
-        iso_checksum: "aae20c8052a55cf179af88d9dd35f1a889cd5773"
-        iso_checksum_algorithm: sha1
-        state: present
+    cobbler_distros: "{{ hostvars['localhost']['cobbler_distros'] }}"
 
     cobbler_profiles:
       - name: CentOS-6-x86_64
@@ -37,11 +95,44 @@
       - name: CentOS-7-x86_64
         distro: CentOS-7-x86_64
         kickstart: /var/lib/cobbler/kickstarts/centos7.ks
+
+  roles:
+    # Docker containers share loop devices with the host, so prior to applly the
+    # cobbler role we need to provisione enough loop devices to allow the role
+    # be able to mount ISO files
+
+    - role: dev
+      dev_special_files: >-
+        {{ loop_device_pattern
+            | dev_expand(
+              n=0 | dev_to(5 + groups['docker_sandbox_containers']
+                            | length * (cobbler_distros | length))) }}
+
+    - role: cobbler
+
   tags:
     - idempotence
+    - role::cobbler::configure::distros
 
-# - name: cleanup docker docker sandbox
+
+#
+# FIX TAGS
+#
+
+
+
+
+# - name: cleanup docker docker sandbox and temporary data
 #   hosts: localhost
 #   roles:
 #     - role: docker_sandbox
 #       docker_sandbox_state: absent
+#
+#   tasks:
+#     - name: remove sha1 temporary files
+#       file:
+#         path: "{{ item.dest }}"
+#         state: absent
+#       with_items: "{{ sha1sum_files }}"
+#       loop_control:
+#         label: "{{ item.dest }}"

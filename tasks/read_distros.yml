@@ -3,49 +3,41 @@
 
 - block:
 
-  # - name: search distro config files
-  #   find:
-  #     paths: "{{ cobbler_config_dir }}/distros.d"
-  #     file_type: file
-  #   register: cobbler_search_distro_config_files_result
-  #
-  # - name: read distros config
-  #   shell: "cat {{ item }}"
-  #   with_items: >-
-  #     {{ cobbler_search_distro_config_files_result. files
-  #         | map(attribute="path")
-  #         | list }}
-  #   register: cobbler_read_distros_config_result
-  #   changed_when: false
-  #
-  # - name: setup fact with distros config in json format
-  #   set_fact:
-  #     cobbler_distros_config_json: >-
-  #       [ {% for item in cobbler_read_distros_config_result.results
-  #                         | default([]) %}
-  #         {{ item.stdout }}
-  #         {% if not loop.last %},{% endif %}
-  #       {% endfor %} ]
-  #
-  # - name: setup fact with distros config in yaml format
-  #   set_fact:
-  #     cobbler_distros_config: >-
-  #       {{ cobbler_distros_config_json | from_json }}
+  - name: search distro config files
+    find:
+      paths: "{{ cobbler_config_dir }}/distros.d"
+      file_type: file
+    register: cobbler_search_distro_config_files_result
 
-  # - name: setup fact with actually present distro names
-  #   set_fact:
-  #     cobbler_distros_present_names: >-
-  #       {{ cobbler_distros_config | map(attribute='name') | list }}
-  #   changed_when: false
+  - name: read distros config
+    shell: "cat {{ item }}"
+    with_items: >-
+      {{ cobbler_search_distro_config_files_result. files
+          | map(attribute="path")
+          | list }}
+    register: cobbler_read_distros_config_result
+    changed_when: false
 
-    - name: setup fact with distros config in yaml format
-      set_fact:
-        cobbler_distros_config: []
+  - name: setup fact with distros config in json format
+    set_fact:
+      cobbler_distros_config_json: "{{ lookup('template', 'distros.j2') }}"
 
-    - name: setup fact with actually present distro names
-      set_fact:
-        cobbler_distros_present_names: []
-      changed_when: false
+  - debug: msg="{{ cobbler_distros_config_json }}"
+
+  - name: setup fact with distros config in yaml format
+    set_fact:
+      cobbler_distros_config: >-
+        {{ cobbler_distros_config_json | from_json }}
+
+  - debug: var=cobbler_distros_config
+
+  - fail:
+
+  - name: setup fact with actually present distro names
+    set_fact:
+      cobbler_distros_present_names: >-
+        {{ cobbler_distros_config | map(attribute='name') | list }}
+    changed_when: false
 
   tags:
     - role::cobbler
