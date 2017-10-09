@@ -5,9 +5,14 @@
 
 cobbler_packages:
   - cobbler
+  - curl
   - debmirror
+  - fence-agents
   - httpd
-  - tftp-server
+  - pykickstart
+  - which
+  - wget
+
 
 # Base directory to temporary mount ISOs
 

@@ -27,19 +27,31 @@ dependencies:
   # - role: selinux
   #   selinux_mode: disabled
 
-  # - role: xinetd
-  #
-  # - role: xinetd_service
-  #   xinetd_service_name: "{{ cobbler_xinetd_service_tftp_name }}"
-  #   xinetd_service_id: "{{ cobbler_xinetd_service_tftp_id }}"
-  #   xinetd_service_package: "{{ cobbler_xinetd_service_tftp_package }}"
-  #   xinetd_service_disable: "{{ cobbler_xinetd_service_tftp_disable }}"
-  #   xinetd_service_socket_type: "{{ cobbler_xinetd_service_tftp_socket_type }}"
-  #   xinetd_service_protocol: "{{ cobbler_xinetd_service_tftp_protocol }}"
-  #   xinetd_service_wait: "{{ cobbler_xinetd_service_tftp_wait }}"
-  #   xinetd_service_user: "{{ cobbler_xinetd_service_tftp_user }}"
-  #   xinetd_service_server: "{{ cobbler_xinetd_service_tftp_server }}"
-  #   xinetd_service_server_args: "{{ cobbler_xinetd_service_tftp_server_args }}"
-  #   xinetd_service_per_source: "{{ cobbler_xinetd_service_tftp_per_source }}"
-  #   xinetd_service_cps: "{{ cobbler_xinetd_service_tftp_cps }}"
-  #   xinetd_service_flags: "{{ cobbler_xinetd_service_tftp_flags }}"
+  - role: xinetd_service
+    xinetd_service_name: tftp
+    xinetd_service_id: tftp
+    xinetd_service_package: tftp-server
+    xinetd_service_disable: no
+    xinetd_service_socket_type: dgram
+    xinetd_service_protocol: udp
+    xinetd_service_wait: yes
+    xinetd_service_user: root
+    xinetd_service_server: /usr/sbin/in.tftpd
+    xinetd_service_server_args: "-B 1380 -v -s /var/lib/tftpboot"
+    xinetd_service_per_source: 11
+    xinetd_service_cps: "100 2"
+    xinetd_service_flags: IPv4
+
+  - role: xinetd_service
+    xinetd_service_name: rsync
+    xinetd_service_id: rsync
+    xinetd_service_package: rsync
+    xinetd_service_disable: no
+    xinetd_service_socket_type: stream
+    xinetd_service_protocol: tcp
+    xinetd_service_wait: no
+    xinetd_service_user: root
+    xinetd_service_server: /usr/bin/rsync
+    xinetd_service_server_args: "--daemon"
+    xinetd_service_flags: IPv4
+    when: ansible_distribution_major_version == "6"

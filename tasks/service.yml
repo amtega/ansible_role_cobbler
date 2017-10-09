@@ -2,12 +2,24 @@
 # Service tasks
 
 - block:
-
   - name: enable and start cobblerd service
     service:
       name: cobblerd
       state: started
       enabled: yes
+
+  - name: enable and start httpd service
+    service:
+      name: httpd
+      state: started
+      enabled: yes
+
+  - name: enable and start rsyncd service
+    service:
+      name: rsyncd
+      state: started
+      enabled: yes
+    when: ansible_distribution_major_version == "7"
 
   - name: download cobbler loaders
     command: cobbler get-loaders
@@ -24,6 +36,6 @@
       'No configuration problems found' not in cobbler_check_result.stdout
     changed_when: false
 
-tags:
-  - role::cobbler
-  - role::cobbler::service
+  tags:
+    - role::cobbler
+    - role::cobbler::service

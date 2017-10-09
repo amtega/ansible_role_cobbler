@@ -41,7 +41,7 @@
     - name: parse sha1 files
       set_fact:
         iso:
-          - name: "{{ item.dest }}"
+          - name: "{{ item.dest | basename }}"
             iso_file: >-
               {{ lookup("pipe",
                         "sed -r 's# +# #g' "
@@ -71,7 +71,7 @@
               | list }}
 
   tags:
-    - role::cobbler::configure::distros
+    - all
 
 
 - name: test cobbler role
@@ -84,6 +84,12 @@
       major: 7
       minor: "{n}"
       mode: "0660"
+
+    cobbler_server: >-
+      {{ hostvars[inventory_hostname]['ansible_eth0']['ipv4']['address'] }}
+
+    cobbler_next_server: >-
+      {{ hostvars[inventory_hostname]['ansible_eth0']['ipv4']['address'] }}
 
     cobbler_distros: "{{ hostvars['localhost']['cobbler_distros'] }}"
 
@@ -112,7 +118,6 @@
 
   tags:
     - idempotence
-    - role::cobbler::configure::distros
 
 
 #

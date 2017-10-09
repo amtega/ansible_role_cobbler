@@ -15,25 +15,6 @@ cobbler_internet_proxy_http: "{{ gnu_linux_internet_proxy_http }}"
 cobbler_internet_proxy_https: "{{ gnu_linux_internet_proxy_https }}"
 
 #
-# Cobbler TFTP xinetd service config
-# See xinetd role to get more info about the format.
-#
-
-cobbler_xinetd_service_tftp_name: tftp
-cobbler_xinetd_service_tftp_id: tftp
-cobbler_xinetd_service_tftp_package: tftp-server
-cobbler_xinetd_service_tftp_disable: no
-cobbler_xinetd_service_tftp_socket_type: dgram
-cobbler_xinetd_service_tftp_protocol: udp
-cobbler_xinetd_service_tftp_wait: yes
-cobbler_xinetd_service_tftp_user: root
-cobbler_xinetd_service_tftp_server: /usr/sbin/in.tftpd
-cobbler_xinetd_service_tftp_server_args: "-B 1380 -v -s /var/lib/tftpboot"
-cobbler_xinetd_service_tftp_per_source: 11
-cobbler_xinetd_service_tftp_cps: "100 2"
-cobbler_xinetd_service_tftp_flags: IPv4
-
-#
 # List of cobbler distros to manage.
 #
 #
