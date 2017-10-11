@@ -27,12 +27,15 @@
       http_proxy: "{{ cobbler_internet_proxy_http }}"
       https_proxy: "{{ cobbler_internet_proxy_https }}"
     register: cobbler_rsync_result
-    changed_when: "'downloading ' in cobbler_rsync_result.stdout"
+    changed_when: >-
+      'downloading' in cobbler_rsync_result.stdout
+
+  - meta: flush_handlers
 
   - name: check cobbler
     command: cobbler check
     register: cobbler_check_result
-    failed_when: >
+    failed_when: >-
       'No configuration problems found' not in cobbler_check_result.stdout
     changed_when: false
 

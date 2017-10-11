@@ -22,16 +22,17 @@
     - "{{ cobbler_tmp_dir }}"
     - "{{ cobbler_iso_dir }}"
     - "{{ cobbler_iso_mount_dir }}"
-
   tags:
     - role::cobbler
     - role::cobbler::install
 
-- name: patch bug in cobbler action check
-  patch:
-    src: "cobbler_action_check.patch"
-    dest: "/usr/lib/python2.6/site-packages/cobbler/action_check.py"
-  when: ansible_distribution_major_version == "6"
+- block:
+  - name: patch bug in cobbler action check
+    patch:
+      src: "cobbler_action_check.patch"
+      dest: "/usr/lib/python2.6/site-packages/cobbler/action_check.py"
+    when: ansible_distribution_major_version == "6"
+    notify: restart cobblerd
 
   tags:
     - role::cobbler

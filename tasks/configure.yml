@@ -1,16 +1,8 @@
 ---
 # Configuration tasks
 
-- block:
-  - name: configure cobbler settings
-    include_tasks: configure_settings.yml
-
-  # It's necessary to start cobbler service because  distros and profiles config
-  # commands require the service be started
-
-  - name: start cobblerd service
-    include_tasks: service.yml
-
+- name: configure cobbler settings
+  include_tasks: configure_settings.yml
   tags:
     - role::cobbler
     - role::cobbler::configure
