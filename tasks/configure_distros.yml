@@ -87,7 +87,7 @@
         dest: "{{ cobbler_iso_dir }}/{{ item.iso_file }}"
         checksum: "{{ item.iso_checksum_algorithm }}:{{ item.iso_checksum }}"
         force: yes
-        timeout: 60
+        timeout: "{{ cobbler_download_timeout }}"
       when: >
         item.state == "present"
         and ( item.name not in cobbler_already_configure_distros_names

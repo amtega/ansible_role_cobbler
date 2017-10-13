@@ -37,7 +37,7 @@ dependencies:
     xinetd_service_wait: yes
     xinetd_service_user: root
     xinetd_service_server: /usr/sbin/in.tftpd
-    xinetd_service_server_args: "-B 1380 -v -s /var/lib/tftpboot"
+    xinetd_service_server_args: "--secure -B 1380 -v -s /var/lib/tftpboot"
     xinetd_service_per_source: 11
     xinetd_service_cps: "100 2"
     xinetd_service_flags: IPv4

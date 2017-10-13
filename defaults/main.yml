@@ -13,6 +13,7 @@ cobbler_tmp_dir: /var/www/cobbler/tmp
 cobbler_iso_dir: "{{ cobbler_tmp_dir }}/iso"
 cobbler_internet_proxy_http: "{{ gnu_linux_internet_proxy_http }}"
 cobbler_internet_proxy_https: "{{ gnu_linux_internet_proxy_https }}"
+cobbler_download_timeout: 120
 
 #
 # List of cobbler distros to manage.
