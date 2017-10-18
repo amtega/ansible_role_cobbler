@@ -9,7 +9,7 @@ cobbler_default_password_crypted: "$1$hZtCu.xn$OcfOoLF7907a.3rd73PqK1"
 cobbler_next_server: "{{ ansible_default_ipv4.address }}"
 cobbler_server: "{{ ansible_default_ipv4.address }}"
 cobbler_config_dir: /var/lib/cobbler/config
-cobbler_tmp_dir: /var/www/cobbler/tmp
+cobbler_tmp_dir: /var/lib/cobbler/tmp
 cobbler_iso_dir: "{{ cobbler_tmp_dir }}/iso"
 cobbler_internet_proxy_http: "{{ gnu_linux_internet_proxy_http }}"
 cobbler_internet_proxy_https: "{{ gnu_linux_internet_proxy_https }}"

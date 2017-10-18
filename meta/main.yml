@@ -21,26 +21,15 @@ galaxy_info:
 dependencies:
   - role: gnu_linux
 
+  - role: tftpd
+
   - role: epel_repository
 
   #
   # - role: selinux
   #   selinux_mode: disabled
 
-  - role: xinetd_service
-    xinetd_service_name: tftp
-    xinetd_service_id: tftp
-    xinetd_service_package: tftp-server
-    xinetd_service_disable: no
-    xinetd_service_socket_type: dgram
-    xinetd_service_protocol: udp
-    xinetd_service_wait: yes
-    xinetd_service_user: root
-    xinetd_service_server: /usr/sbin/in.tftpd
-    xinetd_service_server_args: "--secure -B 1380 -v -s /var/lib/tftpboot"
-    xinetd_service_per_source: 11
-    xinetd_service_cps: "100 2"
-    xinetd_service_flags: IPv4
+
 
   - role: xinetd_service
     xinetd_service_name: rsync

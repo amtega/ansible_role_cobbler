@@ -11,7 +11,7 @@
   - name: read distros config
     shell: "cat {{ item }}"
     with_items: >-
-      {{ cobbler_search_distro_config_files_result. files
+      {{ cobbler_search_distro_config_files_result.files
           | map(attribute="path")
           | list }}
     register: cobbler_read_distros_config_result
@@ -24,27 +24,27 @@
 
 - block:
   - name: delete unnecesary distros
-    command: "cobbler distro remove --name={{ item.name }} --recursive"
+    command: "cobbler distro remove --name={{ item }} --recursive"
     when:
-      item.name in cobbler_absent_distros_names
+      item in cobbler_absent_distros_names
       or ( cobbler_delete_unmanaged
-           and item.name not in cobbler_present_distros_names )
-    with_items: "{{ cobbler_distros_config }}"
+           and item not in cobbler_present_distros_names )
+    with_items: "{{ cobbler_saved_isos }}"
     loop_control:
-      label: "{{ item.name }}"
+      label: "{{ item }}"
 
   - name: delete distros with ISOs checksum not matching with inventory
-    command: "cobbler distro remove --name={{ item.name }} --recursive"
+    command: "cobbler distro remove --name={{ item }} --recursive"
     when:
-      - item.name in cobbler_present_distros_names
+      - item in cobbler_present_distros_names
       - >-
-        item.ks_meta.iso_checksum | default('') not in cobbler_distros
-          | selectattr('name', 'equalto', item.name)
+        cobbler_saved_isos[item]['iso_checksum'] not in cobbler_distros
+          | selectattr('name', 'equalto', item)
           | map(attribute='iso_checksum')
           | list
-    with_items: "{{ cobbler_distros_config }}"
+    with_items: "{{ cobbler_saved_isos }}"
     loop_control:
-      label: "{{ item.name }}"
+      label: "{{ item }}"
 
   - name: search ISO files
     find:
@@ -52,13 +52,13 @@
       file_type: file
     register: cobbler_search_iso_files_result
 
-  - name: delete ISOs not managed by ansible
+  - name: delete ISOs not found in inventory
     file:
       path: "{{ item }}"
       state: absent
     when:
       - cobbler_delete_unmanaged
-      - item | basename not in cobbler_present_iso_names
+      - item | basename not in cobbler_present_isos_names
     with_items: >-
       {{ cobbler_search_iso_files_result.files
           | map(attribute="path")
@@ -79,6 +79,7 @@
       fstype: loop
       state: unmounted
     with_items: "{{ cobbler_find_stalled_iso_tmp_dirs_result.stdout_lines }}"
+    register: cobbler_umount_stalled_isos
 
   - block:
     - name: download ISOs
@@ -90,24 +91,38 @@
         timeout: "{{ cobbler_download_timeout }}"
       when: >
         item.state == "present"
-        and ( item.name not in cobbler_already_configure_distros_names
-              or item.iso_checksum not in
-                  cobbler_distros_config
-                    | selectattr('name', 'equalto', item.name)
-                    | map(attribute='ks_meta')
-                    | map(attribute='iso_checksum')
-                    | list )
+        and (item.name not in cobbler_saved_isos or
+            item.iso_checksum != cobbler_saved_isos[item.name]['iso_checksum'])
       register: cobbler_download_distros_result
       with_items: "{{ cobbler_distros }}"
       loop_control:
         label: "{{ item.iso_url + '/' + item.iso_file }}"
       notify:
         - update cobbler signatures
-
     tags:
       - role::cobbler
       - role::cobbler::configure
       - role::cobbler::configure::distros::download
+
+  - name: update cobbler signatures
+    command: cobbler signature update
+    environment:
+      http_proxy: "{{ cobbler_internet_proxy_http }}"
+      https_proxy: "{{ cobbler_internet_proxy_https }}"
+    register: cobbler_signature_update_result
+    failed_when: >-
+      '*** TASK COMPLETE ***' not in cobbler_signature_update_result.stdout
+    when: >-
+      cobbler_download_distros_result | changed
+      or cobbler_umount_stalled_isos | changed
+    notify:
+      - synchronize cobbler
+    tags:
+      - role::cobbler
+      - role::cobbler::configure
+      - role::cobbler::configure::distros::download
+
+  - meta: flush_handlers
 
   - name: search downloaded ISOs files
     find:
@@ -139,8 +154,6 @@
           | map(attribute="path")
           | list }}
 
-  - meta: flush_handlers
-
   - name: import distros
     command: >-
       cobbler import
@@ -156,7 +169,7 @@
       | map(attribute='name')
       | list
       | first
-      not in cobbler_already_configure_distros_names
+      not in cobbler_saved_isos
     with_items: >-
       {{ cobbler_search_iso_files_result.files
           | map(attribute="path")
@@ -175,14 +188,14 @@
                               | basename)
                               | map(attribute='iso_file')
                               | list
-                              | first }},
+                              | first }}
                 iso_checksum={{ cobbler_distros
                                   | selectattr('iso_file', 'equalto', item
                                   | basename)
                                   | map(attribute='iso_checksum')
                                   | list
                                   | first }}'
-    when:
+    when: >-
       cobbler_distros
       | selectattr('iso_file', 'equalto', item | basename)
       | map(attribute='name')
@@ -194,7 +207,7 @@
           | map(attribute="path")
           | list }}
 
-  - name: delete default profiles created during distros import
+  - name: delete default profile created durin distro import
     command: >-
       cobbler profile remove
       --name={{ cobbler_distros
@@ -214,6 +227,8 @@
       {{ cobbler_search_iso_files_result.files
           | map(attribute="path")
           | list }}
+    loop_control:
+      label: "{{ item | basename }}"
 
   - name: umount ISOs from temporary dirs
     mount:
@@ -249,10 +264,8 @@
           | list }}
 
   vars:
-    cobbler_distros_config: "{{ lookup('template', 'distros.j2') }}"
-
-    cobbler_already_configure_distros_names: >-
-        {{ cobbler_distros_config | map(attribute='name') | list }}
+    cobbler_saved_isos: >-
+      {{ lookup('template', 'saved_distros_isos.j2') | from_yaml }}
 
     cobbler_present_distros_names: >-
         {{ cobbler_distros
@@ -266,7 +279,7 @@
             | map(attribute='name')
             | list }}
 
-    cobbler_present_iso_names: >-
+    cobbler_present_isos_names: >-
         {{ cobbler_distros
             | selectattr('state', 'equalto', 'present')
             | map(attribute='iso_file')
