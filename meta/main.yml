@@ -20,10 +20,16 @@ galaxy_info:
 
 dependencies:
   - role: gnu_linux
+    tags:
+      - role::cobbler::install
 
   - role: tftpd
+    tags:
+      - role::cobbler::install
 
   - role: epel_repository
+    tags:
+      - role::cobbler::install
 
   #
   # - role: selinux
@@ -44,3 +50,5 @@ dependencies:
     xinetd_service_server_args: "--daemon"
     xinetd_service_flags: IPv4
     when: ansible_distribution_major_version == "6"
+    tags:
+      - role::cobbler::install
