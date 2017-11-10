@@ -12,9 +12,24 @@
   tags:
     - role::cobbler
     - role::cobbler::configure
+    - role::cobbler::configure::settings
 
-- name: setup cobbler cobbler
+- name: enable cobbler service
   include_tasks: service.yml
   tags:
     - role::cobbler
     - role::cobbler::service
+
+- name: setup cobbler distros
+  include_tasks: setup_distros.yml
+  tags:
+    - role::cobbler
+    - role::cobbler::configure
+    - role::cobbler::distros
+
+# - name: configure cobbler profles
+#   include_tasks: setup_profiles.yml
+#   tags:
+#     - role::cobbler
+#     - role::cobbler::configure
+#     - role::cobbler::profiles

@@ -16,4 +16,4 @@
 tags:
   - role::cobbler
   - role::cobbler::configure
-  - role::cobbler::configure::profiles
+  - role::cobbler::profiles

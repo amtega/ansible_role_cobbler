@@ -1,23 +1,39 @@
 ---
-# Configuration tasks
+#  Setup cobbler config files
 
-- name: configure cobbler settings
-  include_tasks: configure_settings.yml
+- block:
+
+  - name: configure /etc/cobbler/settings
+    template:
+      src: settings.j2
+      dest: /etc/cobbler/settings
+      owner: root
+      group: root
+      mode: 0644
+      backup: yes
+    notify: restart cobblerd
+
+  - name: configure /etc/cobbler/modules.conf
+    template:
+      src: modules.conf.j2
+      dest: /etc/cobbler/modules.conf
+      owner: root
+      group: root
+      mode: 0644
+      backup: yes
+    notify: restart cobblerd
+
+  - name: configure /etc/debmirror.conf
+    template:
+      src: debmirror.conf.j2
+      dest: /etc/debmirror.conf
+      owner: root
+      group: root
+      mode: 0644
+      backup: yes
+    notify: restart cobblerd
+
   tags:
     - role::cobbler
     - role::cobbler::configure
     - role::cobbler::configure::settings
-
-- name: configure cobbler distros
-  include_tasks: configure_distros.yml
-  tags:
-    - role::cobbler
-    - role::cobbler::configure
-    - role::cobbler::configure::distros
-
-# - name: configure cobbler profles
-#   include_tasks: configure_profiles.yml
-#   tags:
-#     - role::cobbler
-#     - role::cobbler::configure
-#     - role::cobbler::configure::profiles

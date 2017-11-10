@@ -20,7 +20,7 @@
   tags:
     - role::cobbler
     - role::cobbler::configure
-    - role::cobbler::configure::distros
+    - role::cobbler::distros
 
 - block:
   - name: delete unnecesary distros
@@ -102,7 +102,7 @@
     tags:
       - role::cobbler
       - role::cobbler::configure
-      - role::cobbler::configure::distros::download
+      - role::cobbler::distros::download
 
   - name: update cobbler signatures
     command: cobbler signature update
@@ -120,7 +120,7 @@
     tags:
       - role::cobbler
       - role::cobbler::configure
-      - role::cobbler::configure::distros::download
+      - role::cobbler::distros::download
 
   - meta: flush_handlers
 
@@ -288,4 +288,4 @@
   tags:
     - role::cobbler
     - role::cobbler::configure
-    - role::cobbler::configure::distros
+    - role::cobbler::distros
