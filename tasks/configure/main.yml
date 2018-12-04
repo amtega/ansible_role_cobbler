@@ -1,0 +1,8 @@
+---
+# Configure tasks
+
+- name: configure cobbler
+  include_tasks: main.yml
+
+- name: configure cobbler distros
+  include_tasks: distros/main.yml

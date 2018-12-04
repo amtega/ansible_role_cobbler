@@ -2,42 +2,37 @@
 # Role dependencies
 
 galaxy_info:
+  role_name: cobbler
   author: Juan Antonio Valiño García
-  description: Setup docker engine
-  company: Amtega - Xunta de Galicia
-  license: license not defined
-  min_ansible_version: 2.3
+  description: Setup a cobbler server
+  company: AMTEGA - Xunta de Galicia
+  license: GPLv3 or EUPL
+  min_ansible_version: 2.7
   platforms:
-  - name: Fedora
-    versions:
-    - 25
-  - name: EL
-    versions:
-    - 6
-    - 7
+    - name: EL
+      versions:
+        - 6
+        - 7
+    - name: Fedora
+      versions:
+        - 27
+        - 28
   galaxy_tags:
+    - system
     - cobbler
 
 dependencies:
-  - role: gnu_linux
-    tags:
-      - role::cobbler::install
+  - role: amtega.check_platform
+    check_platform_distributions:
+      centos: 6
+      fedora: 27
+      rhel: 6
 
-  - role: tftpd
-    tags:
-      - role::cobbler::install
+  - role: amtega.epel
+  - role: amtega.proxy_client
+  - role: amtega.tftpd
 
-  - role: epel_repository
-    tags:
-      - role::cobbler::install
-
-  #
-  # - role: selinux
-  #   selinux_mode: disabled
-
-
-
-  - role: xinetd_service
+  - role: amtega.xinetd_service
     xinetd_service_name: rsync
     xinetd_service_id: rsync
     xinetd_service_package: rsync
@@ -49,6 +44,17 @@ dependencies:
     xinetd_service_server: /usr/bin/rsync
     xinetd_service_server_args: "--daemon"
     xinetd_service_flags: IPv4
-    when: ansible_distribution_major_version == "6"
-    tags:
-      - role::cobbler::install
+    when: ansible_facts.distribution_major_version is version("6", "==")
+
+  - role: amtega.packages
+    packages_os:
+      all:
+        all:
+          cobbler: present
+          curl: present
+          debmirror: present
+          fence-agents: present
+          httpd: present
+          pykickstart: present
+          which: present
+          wget: present

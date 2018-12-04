@@ -1,0 +1,48 @@
+---
+# Umount ISOs
+
+- block:
+    - name: umount ISOs from temporary dirs
+      mount:
+        fstype: iso9660
+        opts: "loop,ro"
+        src: "{{ cobbler_iso_file }}"
+        name: "{{ cobbler_iso_mount_dir }}/{{ cobbler_iso_file | basename }}"
+        state: unmounted
+      loop: >-
+        {{ cobbler_search_iso_files_result.files
+           | map(attribute="path")
+           | list }}
+      loop_control:
+        loop_var: cobbler_iso_file
+
+    - name: search ISOs temporary dirs
+      command: >-
+        find "{{ cobbler_iso_dir }}/mounted" -maxdepth 1 -mindepth 1 -type d
+      register: cobbler_find_iso_tmpdirs_result
+      changed_when: false
+
+    - name: remove ISOs temporary dirs
+      file:
+        path: "{{ cobbler_iso_tmp_dir }}"
+        state: absent
+      loop: "{{ cobbler_find_iso_tmpdirs_result.stdout_lines }}"
+      loop_control:
+        loop_var: cobbler_iso_tmp_dir
+
+    - name: delete downloaded ISOs
+      file:
+        path: "{{ cobbler_iso_file }}"
+        state: absent
+      loop: >-
+        {{ cobbler_search_iso_files_result.files
+           | map(attribute="path")
+           | list }}
+      loop_control:
+        loop_var: cobbler_iso_file
+  tags:
+    - role::cobbler
+    - role::cobbler::configure
+    - role::cobbler::configure::distros
+    - role::cobbler::configure::distros::isos
+    - role::cobbler::configure::distros::isos::download

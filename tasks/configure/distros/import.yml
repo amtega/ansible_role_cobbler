@@ -1,0 +1,95 @@
+---
+# Import distros
+
+- block:
+    - name: import distros
+      command: >-
+        cobbler import
+        --name={{ cobbler_distros
+                    | selectattr('iso_file', 'equalto', cobbler_iso_file | basename)
+                    | map(attribute='name')
+                    | list
+                    | first }}
+        --path={{ cobbler_iso_mount_dir }}/{{ cobbler_iso_file | basename }}
+      when: >
+        cobbler_distros
+        | selectattr('iso_file', 'equalto', cobbler_iso_file | basename)
+        | map(attribute='name')
+        | list
+        | first
+        not in cobbler_saved_isos
+      loop: >-
+        {{ cobbler_search_iso_files_result.files
+           | map(attribute="path")
+           | list }}
+      loop_control:
+        loop_var: cobbler_iso_file
+
+    - name: add ksmeta attributes to distros config
+      command: >-
+        cobbler distro edit
+        --name={{ cobbler_distros
+                  | selectattr('iso_file',
+                               'equalto',
+                               cobbler_iso_file | basename)
+                  | map(attribute='name')
+                  | list
+                  | first }}
+        --ksmeta='iso_file={{ cobbler_distros
+                              | selectattr('iso_file',
+                                           'equalto',
+                                           cobbler_iso_file
+                              | basename)
+                              | map(attribute='iso_file')
+                              | list
+                              | first }}
+                  iso_checksum={{ cobbler_distros
+                                  | selectattr('iso_file',
+                                               'equalto',
+                                                cobbler_iso_file | basename)
+                                  | map(attribute='iso_checksum')
+                                  | list
+                                  | first }}'
+      when: >-
+        cobbler_distros
+        | selectattr('iso_file', 'equalto', cobbler_iso_file | basename)
+        | map(attribute='name')
+        | list
+        | first
+        not in cobbler_already_configure_distros_names
+      loop: >-
+        {{ cobbler_search_iso_files_result.files
+           | map(attribute="path")
+           | list }}
+      loop_control:
+        loop_var: cobbler_iso_file
+
+    - name: delete default profile created during distro import
+      command: >-
+        cobbler profile remove
+        --name={{ cobbler_distros
+                  | selectattr('iso_file',
+                               'equalto',
+                               cobbler_iso_file | basename)
+                  | map(attribute='name')
+                  | list
+                  | first }}
+        --recursive
+      when: >
+        cobbler_distros
+        | selectattr('iso_file', 'equalto', cobbler_iso_file | basename)
+        | map(attribute='name')
+        | list
+        | first
+        not in cobbler_already_configure_distros_names
+      loop: >-
+        {{ cobbler_search_iso_files_result.files
+           | map(attribute="path")
+           | list }}
+      loop_control:
+        loop_var: cobbler_iso_file
+        label: "{{ cobbler_iso_file | basename }}"
+  vars:
+    - role::cobbler
+    - role::cobbler::configure
+    - role::cobbler::configure::distros

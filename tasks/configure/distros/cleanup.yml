@@ -1,0 +1,53 @@
+---
+# Cleanup distros
+
+- block:
+    - name: delete unnecesary distros
+      command: >-
+        cobbler distro remove \
+        --name={{ cobbler_saved_iso }}
+        --recursive
+      when:
+        cobbler_saved_iso in cobbler_absent_distros_names
+        or (cobbler_delete_unmanaged
+            and cobbler_saved_iso not in cobbler_present_distros_names)
+      loop: "{{ cobbler_saved_isos }}"
+      loop_control:
+        loop_var: cobbler_saved_iso
+        label: "{{ cobbler_saved_iso }}"
+
+    - name: delete distros with ISOs checksum not matching with inventory
+      command: >-
+        cobbler distro remove --name={{ cobbler_saved_iso }} --recursive
+      when:
+        - cobbler_saved_iso in cobbler_present_distros_names
+        - >-
+          cobbler_saved_isos[cobbler_saved_iso]['iso_checksum']
+          not in cobbler_distros
+                 | selectattr('name', 'equalto', cobbler_saved_iso)
+                 | map(attribute='iso_checksum')
+                 | list
+      loop: "{{ cobbler_saved_isos }}"
+      loop_control:
+        loop_var: cobbler_saved_iso
+        label: "{{ cobbler_saved_iso }}"
+  vars:
+    cobbler_saved_isos: >-
+      {{ lookup('template', 'saved_distros_isos.j2') | from_yaml }}
+
+    cobbler_present_distros_names: >-
+        {{ cobbler_distros
+           | selectattr('state', 'equalto', 'present')
+           | map(attribute='name')
+           | list }}
+
+    cobbler_absent_distros_names: >-
+        {{ cobbler_distros
+           | selectattr('state', 'equalto', 'absent')
+           | map(attribute='name')
+           | list }}
+  tags:
+    - role::cobbler
+    - role::cobbler::configure
+    - role::cobbler::configure::distros
+    - role::cobbler::configure::distros::cleanup

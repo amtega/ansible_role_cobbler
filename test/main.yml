@@ -34,7 +34,7 @@
         dest: "{{ item.dest }}"
         force: yes
         timeout: 60
-      with_items: "{{ sha1sum_files }}"
+      loop: "{{ sha1sum_files }}"
       loop_control:
         label: "{{ item.dest }}"
 
@@ -58,7 +58,7 @@
             iso_checksum_algorithm: sha1
             state: present
       register: sha1_parse_result
-      with_items: "{{ sha1sum_files }}"
+      loop: "{{ sha1sum_files }}"
       loop_control:
         label: "{{ item.dest }}"
 
@@ -138,6 +138,6 @@
 #       file:
 #         path: "{{ item.dest }}"
 #         state: absent
-#       with_items: "{{ sha1sum_files }}"
+#       loop: "{{ sha1sum_files }}"
 #       loop_control:
 #         label: "{{ item.dest }}"

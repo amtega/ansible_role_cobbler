@@ -1,0 +1,24 @@
+---
+# Read distros config
+
+- block:
+    - name: search distro config files
+      find:
+        paths: "{{ cobbler_config_dir }}/distros.d"
+        file_type: file
+      register: cobbler_search_distro_config_files_result
+
+    - name: read distros config
+      shell: "cat {{ cobbler_distro_config_file }}"
+      register: cobbler_read_distros_config_result
+      changed_when: false
+      loop: >-
+        {{ cobbler_search_distro_config_files_result.files
+           | map(attribute="path")
+           | list }}
+      loop_control:
+        loop_var: cobbler_distro_config_file
+  tags:
+    - role::cobbler
+    - role::cobbler::configure
+    - role::cobbler::configure::distros

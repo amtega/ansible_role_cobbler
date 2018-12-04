@@ -1,0 +1,36 @@
+---
+# Download ISOs
+
+- block:
+    - name: download ISOs
+      get_url:
+        url: >_
+          {{ cobbler_iso_download.iso_url }}/{{ cobbler_iso_download.iso_file }}
+        dest: "{{ cobbler_iso_dir }}/{{ cobbler_iso_download.iso_file }}"
+        checksum: >-
+          {{ cobbler_iso_download.iso_checksum_algorithm
+             + ":"
+             + cobbler_iso_download.iso_checksum }}
+        force: yes
+        timeout: "{{ cobbler_download_timeout }}"
+      when: >
+        cobbler_iso_download.state == "present"
+        and (cobbler_iso_download.name not in cobbler_saved_isos
+             or cobbler_iso_download.iso_checksum
+                != cobbler_saved_isos[cobbler_iso_download.name]['iso_checksum'])
+      register: cobbler_download_distros_result
+      loop: "{{ cobbler_distros }}"
+      loop_control:
+        loop_var: cobbler_iso_download
+        label: >-
+          {{ cobbler_iso_download.iso_url + '/' + cobbler_iso_download.iso_file }}
+      notify:
+        - update cobbler signatures
+
+    - meta: flush_handlers
+tags:
+  - role::cobbler
+  - role::cobbler::configure
+  - role::cobbler::configure::distros
+  - role::cobbler::configure::distros::isos
+  - role::cobbler::configure::distros::isos::download

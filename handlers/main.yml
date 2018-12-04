@@ -20,3 +20,20 @@
     - role::cobbler
     - role::cobbler::service
     - role::cobbler::synchronize
+
+- name: cobbler update signatures
+  command: cobbler signature update
+  environment: "{{ proxy_client_environment }}"
+  register: cobbler_signature_update_result
+  failed_when: >-
+    '*** TASK COMPLETE ***' not in cobbler_signature_update_result.stdout
+  when: >-
+    cobbler_download_distros_result | changed
+    or cobbler_umount_stalled_isos | changed
+  listen:
+    - update signatures
+  notify:
+    - synchronize cobbler
+  tags:
+    - role::cobbler
+    - role::cobbler::signatures

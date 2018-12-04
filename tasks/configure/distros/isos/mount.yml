@@ -1,0 +1,38 @@
+---
+# Mount ISOs
+
+- block:
+    - include_tasks: search.yml
+
+    - name: create temporary mount dirs for ISOs
+      file:
+        path: "{{ cobbler_iso_mount_dir }}/{{ cobbler_iso_file | basename }}"
+        state: directory
+        owner: root
+        group: root
+        mode: 0755
+      loop: >-
+        {{ cobbler_search_iso_files_result.files
+           | map(attribute="path")
+           | list }}
+      loop_control:
+        loop_var: cobbler_iso_file
+
+    - name: mount ISOs in temporary directories
+      mount:
+        fstype: iso9660
+        opts: "loop,ro"
+        src: "{{ cobbler_iso_file }}"
+        path: "{{ cobbler_iso_mount_dir }}/{{ cobbler_iso_file | basename }}"
+        state: mounted
+      loop: >-
+        {{ cobbler_search_iso_files_result.files
+           | map(attribute="path")
+           | list }}
+      loop_control:
+        loop_var: cobbler_iso_file
+  tags:
+    - role::cobbler
+    - role::cobbler::configure
+    - role::cobbler::configure::distros
+    - role::cobbler::configure::distros::isos

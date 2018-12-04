@@ -1,19 +1,6 @@
 ---
 # Role variables
 
-# Packages required by cobbler service
-
-cobbler_packages:
-  - cobbler
-  - curl
-  - debmirror
-  - fence-agents
-  - httpd
-  - pykickstart
-  - which
-  - wget
-
-
 # Base directory to temporary mount ISOs
 
 cobbler_iso_mount_dir: "{{ cobbler_iso_dir }}/mounted"

@@ -1,0 +1,49 @@
+---
+# Cleanup ISOs
+
+- block:
+    - include_tasks: search.yml
+
+    - name: delete ISOs not found in inventory
+      file:
+        path: "{{ cobbler_iso_file }}"
+        state: absent
+      when:
+        - cobbler_delete_unmanaged
+        - cobbler_iso_file | basename not in cobbler_present_isos_names
+      loop: >-
+        {{ cobbler_search_iso_files_result.files
+           | map(attribute="path")
+           | list }}
+      loop_control:
+        loop_var: cobbler_iso_file
+        label: "{{ cobbler_iso_file | basename }}"
+      vars:
+        cobbler_present_isos_names: >-
+          {{ cobbler_distros
+             | selectattr('state', 'equalto', 'present')
+             | map(attribute='iso_file')
+             | list }}
+
+    - name: find stalled mounted ISOs dirs
+      command: >-
+        find {{ cobbler_iso_dir }}/mounted -mindepth 1 -maxdepth 1 -type d
+      register: cobbler_find_stalled_iso_tmp_dirs_result
+      changed_when: false
+
+    - name: umount stalled ISOs out of temporary dirs
+      mount:
+        name: "{{ cobbler_mounted_iso }}"
+        src: /dev/null
+        fstype: loop
+        state: unmounted
+      loop: "{{ cobbler_find_stalled_iso_tmp_dirs_result.stdout_lines }}"
+      loop_control:
+        loop_var: cobbler_mounted_iso
+      register: cobbler_umount_stalled_isos
+  tags:
+    - role::cobbler
+    - role::cobbler::configure
+    - role::cobbler::configure::distros
+    - role::cobbler::configure::distros::isos
+    - role::cobbler::configure::distros::isos::cleanup

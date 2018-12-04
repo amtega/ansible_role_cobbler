@@ -1,0 +1,40 @@
+---
+# Configure service tasks
+
+- block:
+    - name: enable and start cobblerd service
+      service:
+        name: cobblerd
+        state: started
+        enabled: yes
+
+    - name: enable and start httpd service
+      service:
+        name: httpd
+        state: started
+        enabled: yes
+
+    - name: enable and start rsyncd service
+      service:
+        name: rsyncd
+        state: started
+        enabled: yes
+      when: ansible_facts.distribution_major_version is version("7", ">=")
+
+    - name: download cobbler loaders
+      command: cobbler get-loaders
+      environment: "{{ proxy_client_environment }}"
+      register: cobbler_rsync_result
+      changed_when: 'downloading' in cobbler_rsync_result.stdout
+
+    - meta: flush_handlers
+
+    - name: check cobbler
+      command: cobbler check
+      register: cobbler_check_result
+      failed_when: >-
+        'No configuration problems found' not in cobbler_check_result.stdout
+      changed_when: false
+  tags:
+    - role::cobbler
+    - role::cobbler::configure::service

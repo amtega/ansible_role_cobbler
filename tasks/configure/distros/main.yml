@@ -1,0 +1,15 @@
+---
+# Configure distros tasks
+
+- block:
+    - include_tasks: read.yml
+    - include_tasks: cleanup.yml
+    - include_tasks: isos/cleanup.yml
+    - include_tasks: isos/download.yml
+    - include_tasks: isos/mount.yml
+    - include_tasks: import.yml
+    - include_tasks: isos/umount.yml
+  tags:
+    - role::cobbler
+    - role::cobbler::configure
+    - role::cobbler::configure::distros

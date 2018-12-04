@@ -6,13 +6,11 @@
 #
 
 cobbler_default_password_crypted: "$1$hZtCu.xn$OcfOoLF7907a.3rd73PqK1"
-cobbler_next_server: "{{ ansible_default_ipv4.address }}"
-cobbler_server: "{{ ansible_default_ipv4.address }}"
+cobbler_next_server: "{{ ansible_facts.default_ipv4.address }}"
+cobbler_server: "{{ ansible_facts.default_ipv4.address }}"
 cobbler_config_dir: /var/lib/cobbler/config
 cobbler_tmp_dir: /var/lib/cobbler/tmp
 cobbler_iso_dir: "{{ cobbler_tmp_dir }}/iso"
-cobbler_internet_proxy_http: "{{ gnu_linux_internet_proxy_http }}"
-cobbler_internet_proxy_https: "{{ gnu_linux_internet_proxy_https }}"
 cobbler_download_timeout: 120
 
 #
@@ -31,14 +29,14 @@ cobbler_download_timeout: 120
 #
 #  - name: CentOS-6-x86_64
 #    iso_file: CentOS-6.7-x86_64-minimal.iso
-#    iso_url: "http://ftp.cixug.es/CentOS/6/isos/x86_64"
-#    iso_checksum: "9381a24b8bee2fed0c26896141a64b69"
+#    iso_url: http://ftp.cixug.es/CentOS/6/isos/x86_64
+#    iso_checksum: 9381a24b8bee2fed0c26896141a64b69
 #    iso_checksum_algorithm: md5
 #
 #  - name: CentOS-7-x86_64
 #    iso_file: CentOS-7-x86_64-Minimal-1511.iso
-#    iso_url: "http://ftp.cixug.es/CentOS/7/isos/x86_64"
-#    iso_checksum: "88c0437f0a14c6e2c94426df9d43cd67"
+#    iso_url: http://ftp.cixug.es/CentOS/7/isos/x86_64
+#    iso_checksum: 88c0437f0a14c6e2c94426df9d43cd67
 #    iso_checksum_algorithm: md5
 
 cobbler_distros:

@@ -1,0 +1,8 @@
+---
+# Configure cobbler tasks
+
+- name: configure cobbler
+  include_tasks: settings.yml
+
+- name: configure cobbler service
+  include_tasks: service.yml

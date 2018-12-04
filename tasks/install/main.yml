@@ -1,0 +1,29 @@
+---
+# Install tasks
+
+- block:
+    - name: create config directories
+      file:
+        path: "{{ cobbler_config_dir }}"
+        state: directory
+        owner: root
+        group: root
+        mode: 0755
+      loop:
+        - "{{ cobbler_tmp_dir }}"
+        - "{{ cobbler_iso_dir }}"
+        - "{{ cobbler_iso_mount_dir }}"
+      loop_control:
+        loop_var: cobbler_config_dir
+
+    - name: patch bug in cobbler action check
+      patch:
+        src: "cobbler_action_check.patch"
+        dest: "/usr/lib/python2.6/site-packages/cobbler/action_check.py"
+      when: ansible.distribution_major_version is version ("6", "==")
+      notify: restart cobblerd
+      tags:
+        - role::cobbler::install::patch
+  tags:
+    - role::cobbler
+    - role::cobbler::install
