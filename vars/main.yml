@@ -1,6 +1,10 @@
 ---
 # Role variables
 
+# Main config dir
+
+cobbler_main_config_dir: /etc/cobbler
+
 # Base directory to temporary mount ISOs
 
 cobbler_iso_mount_dir: "{{ cobbler_iso_dir }}/mounted"

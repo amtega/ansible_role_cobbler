@@ -2,7 +2,7 @@
 # Role tasks
 
 - name: install cobbler
-  include_tasks: main/install.yml
+  include_tasks: install/main.yml
   tags:
     - role::cobbler
     - role::cobbler::install

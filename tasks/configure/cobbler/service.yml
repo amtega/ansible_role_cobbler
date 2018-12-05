@@ -37,4 +37,5 @@
       changed_when: false
   tags:
     - role::cobbler
+    - role::cobbler::configure
     - role::cobbler::configure::service

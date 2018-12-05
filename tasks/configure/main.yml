@@ -2,7 +2,13 @@
 # Configure tasks
 
 - name: configure cobbler
-  include_tasks: main.yml
+  include_tasks: cobbler/main.yml
+  tags:
+    - role::cobbler
+    - role::cobbler::configure
 
 - name: configure cobbler distros
   include_tasks: distros/main.yml
+  tags:
+    - role::cobbler
+    - role::cobbler::configure
