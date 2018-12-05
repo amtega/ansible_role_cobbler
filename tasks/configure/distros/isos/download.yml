@@ -3,34 +3,41 @@
 
 - block:
     - name: download ISOs
-      get_url:
-        url: >_
-          {{ cobbler_iso_download.iso_url }}/{{ cobbler_iso_download.iso_file }}
-        dest: "{{ cobbler_iso_dir }}/{{ cobbler_iso_download.iso_file }}"
-        checksum: >-
-          {{ cobbler_iso_download.iso_checksum_algorithm
-             + ":"
-             + cobbler_iso_download.iso_checksum }}
-        force: yes
-        timeout: "{{ cobbler_download_timeout }}"
+      include_role:
+        name: amtega.artifact
+      vars:
+        override:
+          id: "{{ cobbler_distro_artifact_id }}"
+          dest: "{{ cobbler_iso_dir }}/{{ cobbler_distro.artifact.dest }}"
+        artifact: "{{ dobbler_distro.artifact | combine(override) }}"
       when: >
-        cobbler_iso_download.state == "present"
-        and (cobbler_iso_download.name not in cobbler_saved_isos
-             or cobbler_iso_download.iso_checksum
-                != cobbler_saved_isos[cobbler_iso_download.name]['iso_checksum'])
-      register: cobbler_download_distros_result
+        dobbler_distro.state == "present"
+        and dobbler_distro.name not in cobbler_saved_isos
       loop: "{{ cobbler_distros }}"
       loop_control:
-        loop_var: cobbler_iso_download
-        label: >-
-          {{ cobbler_iso_download.iso_url + '/' + cobbler_iso_download.iso_file }}
-      notify:
-        - update cobbler signatures
+        loop_var: dobbler_distro
+        label: "{{ dobbler_distro.artifact.file }}"
 
-    - meta: flush_handlers
-tags:
-  - role::cobbler
-  - role::cobbler::configure
-  - role::cobbler::configure::distros
-  - role::cobbler::configure::distros::isos
-  - role::cobbler::configure::distros::isos::download
+    - name: update cobbler signatures
+      command: cobbler signature update
+      environment: "{{ proxy_client_environment }}"
+      register: cobbler_signature_update_result
+      failed_when: >-
+        '*** TASK COMPLETE ***' not in cobbler_signature_update_result.stdout
+      when: >-
+        lookup('vars',
+               'artifact_result_' + cobbler_distro_artifact_id)['changed']
+        or cobbler_umount_stalled_isos | changed
+      notify:
+        - synchronize cobbler
+  vars:
+    cobbler_distro_artifact_id: >-
+      cobbler_{{ dobbler_distro.name
+                 | regex_replace(" ", "")
+                 | regex_replace("-", "_") }}
+  tags:
+    - role::cobbler
+    - role::cobbler::configure
+    - role::cobbler::configure::distros
+    - role::cobbler::configure::distros::isos
+    - role::cobbler::configure::distros::isos::download
