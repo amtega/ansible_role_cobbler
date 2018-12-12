@@ -22,39 +22,40 @@ galaxy_info:
     - cobbler
 
 dependencies:
-  - role: amtega.check_platform
-    check_platform_distributions:
-      centos: 6
-      fedora: 27
-      rhel: 6
-
-  - role: amtega.epel
-  - role: amtega.proxy_client
-  - role: amtega.tftpd
-
-  - role: amtega.xinetd_service
-    xinetd_service_name: rsync
-    xinetd_service_id: rsync
-    xinetd_service_package: rsync
-    xinetd_service_disable: no
-    xinetd_service_socket_type: stream
-    xinetd_service_protocol: tcp
-    xinetd_service_wait: no
-    xinetd_service_user: root
-    xinetd_service_server: /usr/bin/rsync
-    xinetd_service_server_args: "--daemon"
-    xinetd_service_flags: IPv4
-    when: ansible_facts.distribution_major_version is version("6", "==")
-
-  - role: amtega.packages
-    packages_os:
-      all:
-        all:
-          cobbler: present
-          curl: present
-          debmirror: present
-          fence-agents: present
-          httpd: present
-          pykickstart: present
-          which: present
-          wget: present
+  # - role: amtega.check_platform
+  #   check_platform_distributions:
+  #     centos: 6
+  #     fedora: 27
+  #     rhel: 6
+  #
+  # - role: amtega.epel
+  # - role: amtega.proxy_client
+  # - role: amtega.tftpd
+  #
+  # - role: amtega.xinetd_service
+  #   xinetd_service_name: rsync
+  #   xinetd_service_id: rsync
+  #   xinetd_service_package: rsync
+  #   xinetd_service_disable: no
+  #   xinetd_service_socket_type: stream
+  #   xinetd_service_protocol: tcp
+  #   xinetd_service_wait: no
+  #   xinetd_service_user: root
+  #   xinetd_service_server: /usr/bin/rsync
+  #   xinetd_service_server_args: "--daemon"
+  #   xinetd_service_flags: IPv4
+  #   when: ansible_facts.distribution_major_version is version("6", "==")
+  #
+  # - role: amtega.packages
+  #   packages_os:
+  #     all:
+  #       all:
+  #         cobbler: present
+  #         cobbler-web: present
+  #         curl: present
+  #         debmirror: present
+  #         fence-agents: present
+  #         httpd: present
+  #         pykickstart: present
+  #         which: present
+  #         wget: present

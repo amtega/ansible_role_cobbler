@@ -1,40 +1,116 @@
 ---
 # Role default lower priority variables
 
-#
-# Cobbler general config
-#
+# Cobbler config directory
 
-cobbler_default_password_crypted: "$1$hZtCu.xn$OcfOoLF7907a.3rd73PqK1"
-cobbler_next_server: "{{ ansible_facts.default_ipv4.address }}"
-cobbler_server: "{{ ansible_facts.default_ipv4.address }}"
 cobbler_config_dir: /var/lib/cobbler/config
+
+# Cobbler temporary directory
+
 cobbler_tmp_dir: /var/lib/cobbler/tmp
+
+# Cobbler ISOs directory
+
 cobbler_iso_dir: "{{ cobbler_tmp_dir }}/iso"
-cobbler_download_timeout: 120
 
-# List of application artifacts to deploy. Take a look to `amtega.artifact` role
-# documentation to known about supported types of artifacts, their specific
-# settings and how to configure a proxy if necessary.
-#
-# The artifact attributes `owner` and `group` will be overriden to match tomcat
-# instance user and group
-#
-# The artifact attribute `dest` is relative to the tomcat instance base
-#
-# Sample:
-#
-# tomcat_application_artifacts:
-#   - id: sample_war
-#     type: https
-#     host: https://tomcat.apache.org
-#     path: tomcat-8.0-doc/appdev/sample
-#     file: sample.war
-#     dest: webapps
-#     timeout: 120
-#     validate_certs: yes
+# Cobbler own settings. These settings have the same meaning that the ones
+# detailed in the cobbler documentation, but here they are prefixed by
+# "cobbler_"
 
-#
+cobbler_allow_duplicate_hostnames: no
+cobbler_allow_duplicate_ips: no
+cobbler_allow_duplicate_macs: no
+cobbler_allow_dynamic_settings: no
+
+cobbler_anamon_enabled: no
+
+cobbler_authn_pam_service: login
+cobbler_auth_token_expiration: 3600
+
+cobbler_cheetah_import_whitelist:
+ - random
+ - re
+ - time
+
+cobbler_createrepo_flags: -c cache -s sha
+
+cobbler_default_kickstart: /var/lib/cobbler/kickstarts/default.ks
+
+cobbler_default_name_servers: []
+
+cobbler_default_ownership:
+ - admin
+
+cobbler_default_password_crypted: $1$hZtCu.xn$OcfOoLF7907a.3rd73PqK1
+
+cobbler_default_template_type: cheetah
+
+cobbler_enable_gpxe: no
+
+cobbler_enable_menu: yes
+
+cobbler_http_port: 80
+
+cobbler_kernel_options:
+ ksdevice: bootif
+ lang: ' '
+ text: ~
+
+cobbler_manage_dhcp: no
+cobbler_manage_dns: no
+cobbler_manage_tftpd: no
+cobbler_manage_rsync: no
+
+cobbler_next_server: "{{ ansible_facts.default_ipv4.address }}"
+
+
+cobbler_pxe_just_once: yes
+
+cobbler_pxe_template_dir: /etc/cobbler/pxe
+
+cobbler_consoles: /var/consoles
+
+cobbler_redhat_management_type: off
+cobbler_redhat_management_server: xmlrpc.rhn.redhat.com
+cobbler_redhat_management_key: ""
+cobbler_redhat_management_permissive: no
+
+cobbler_register_new_installs: no
+
+cobbler_reposync_flags: -l -n -d
+
+cobbler_restart_dns: yes
+cobbler_restart_dhcp: yes
+
+cobbler_run_install_triggers: yes
+
+cobbler_server: "{{ ansible_facts.default_ipv4.address }}"
+
+cobbler_client_use_localhost: no
+cobbler_client_use_https: no
+
+cobbler_snippetsdir: /var/lib/cobbler/snippets
+
+cobbler_template_remote_kickstarts: no
+
+cobbler_webdir: /var/www/cobbler
+
+cobbler_xmlrpc_port: 25151
+
+cobbler_yum_post_install_mirror: yes
+cobbler_yum_distro_priority: yes
+cobbler_yumdownloader_flags: --resolve
+
+cobbler_serializer_pretty_json: no
+
+cobbler_replicate_rsync_options: -avzH
+cobbler_replicate_repo_rsync_options: -avzH
+
+cobbler_always_write_dhcp_entries: no
+
+cobbler_proxy_url_ext: >-
+  {{ proxy_client_http_proxy | default(proxy_client_https_proxy) }}
+cobbler_proxy_url_int: ""
 
 # List of dicts with the cobbler distros to manage. The format of the list items
 # is:
@@ -76,7 +152,6 @@ cobbler_download_timeout: 120
 
 cobbler_distros:
 
-#
 # List of cobbler profiles to manage.
 #
 #

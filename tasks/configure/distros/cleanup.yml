@@ -11,7 +11,7 @@
         cobbler_saved_iso in cobbler_absent_distros_names
         or (cobbler_delete_unmanaged
             and cobbler_saved_iso not in cobbler_present_distros_names)
-      loop: "{{ cobbler_saved_isos }}"
+      loop: "{{ cobbler_saved_isos.keys() }}"
       loop_control:
         loop_var: cobbler_saved_iso
         label: "{{ cobbler_saved_iso }}"
@@ -27,14 +27,11 @@
                  | selectattr('name', 'equalto', cobbler_saved_iso)
                  | map(attribute='iso_checksum')
                  | list
-      loop: "{{ cobbler_saved_isos }}"
+      loop: "{{ cobbler_saved_isos.keys() }}"
       loop_control:
         loop_var: cobbler_saved_iso
         label: "{{ cobbler_saved_iso }}"
   vars:
-    cobbler_saved_isos: >-
-      {{ lookup('template', 'saved_distros_isos.j2') | from_yaml }}
-
     cobbler_present_distros_names: >-
         {{ cobbler_distros
            | selectattr('state', 'equalto', 'present')

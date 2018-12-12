@@ -22,7 +22,7 @@
         cobbler_present_isos_names: >-
           {{ cobbler_distros
              | selectattr('state', 'equalto', 'present')
-             | map(attribute='iso_file')
+             | map(attribute='artifact.file')
              | list }}
 
     - name: find stalled mounted ISOs dirs

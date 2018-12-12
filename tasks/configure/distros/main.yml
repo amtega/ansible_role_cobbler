@@ -9,7 +9,14 @@
     - include_tasks: isos/mount.yml
     - include_tasks: import.yml
     - include_tasks: isos/umount.yml
+  vars:
+    cobbler_saved_isos: >-
+      {{ lookup('template', 'saved_distros_isos.j2') | from_yaml }}
   tags:
     - role::cobbler
     - role::cobbler::configure
     - role::cobbler::configure::distros
+    - role::cobbler::configure::distros::cleanup
+    - role::cobbler::configure::distros::isos
+    - role::cobbler::configure::distros::isos::cleanup
+    - role::cobbler::configure::distros::isos::download

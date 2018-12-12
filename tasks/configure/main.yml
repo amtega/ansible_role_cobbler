@@ -6,9 +6,15 @@
   tags:
     - role::cobbler
     - role::cobbler::configure
+    - role::cobbler::configure::service
 
 - name: configure cobbler distros
   include_tasks: distros/main.yml
   tags:
     - role::cobbler
     - role::cobbler::configure
+    - role::cobbler::configure::distros
+    - role::cobbler::configure::distros::cleanup
+    - role::cobbler::configure::distros::isos
+    - role::cobbler::configure::distros::isos::cleanup
+    - role::cobbler::configure::distros::isos::download

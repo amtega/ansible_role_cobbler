@@ -6,35 +6,45 @@
       include_role:
         name: amtega.artifact
       vars:
+        cobbler_distro_artifact_id: >-
+          cobbler_{{ cobbler_distro.name
+                     | regex_replace(" ", "")
+                     | regex_replace("-", "_") }}
+
         override:
           id: "{{ cobbler_distro_artifact_id }}"
-          dest: "{{ cobbler_iso_dir }}/{{ cobbler_distro.artifact.dest }}"
-        artifact: "{{ dobbler_distro.artifact | combine(override) }}"
-      when: >
-        dobbler_distro.state == "present"
-        and dobbler_distro.name not in cobbler_saved_isos
+          dest: >-
+            {{ cobbler_iso_dir }}/{{ cobbler_distro.artifact.dest
+                                     | default("") }}
+
+        artifact: "{{ cobbler_distro.artifact | combine(override) }}"
+      when: >-
+        cobbler_distro.state == "present"
+        and cobbler_distro.name not in cobbler_saved_isos
       loop: "{{ cobbler_distros }}"
       loop_control:
-        loop_var: dobbler_distro
-        label: "{{ dobbler_distro.artifact.file }}"
+        loop_var: cobbler_distro
+        label: "{{ cobbler_distro.artifact.file }}"
+
+    - name: setup fact with downloads result
+      include_role:
+        name: amtega.select_hostvars
+      vars:
+        select_hostvars_pattern: "artifact_result_.*"
+        select_hostvars_attributes: [ changed ]
+        select_hostvars_fact_name: cobbler_download_isos_result
+        select_hostvars_output_type: list
 
     - name: update cobbler signatures
       command: cobbler signature update
-      environment: "{{ proxy_client_environment }}"
       register: cobbler_signature_update_result
       failed_when: >-
         '*** TASK COMPLETE ***' not in cobbler_signature_update_result.stdout
       when: >-
-        lookup('vars',
-               'artifact_result_' + cobbler_distro_artifact_id)['changed']
-        or cobbler_umount_stalled_isos | changed
+        cobbler_download_isos_result | selectattr('changed') | list | length > 0
+        or cobbler_umount_stalled_isos is changed
       notify:
         - synchronize cobbler
-  vars:
-    cobbler_distro_artifact_id: >-
-      cobbler_{{ dobbler_distro.name
-                 | regex_replace(" ", "")
-                 | regex_replace("-", "_") }}
   tags:
     - role::cobbler
     - role::cobbler::configure
