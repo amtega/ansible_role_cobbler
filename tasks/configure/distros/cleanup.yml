@@ -2,10 +2,6 @@
 # Cleanup distros
 
 - block:
-    - debug: var=cobbler_download_isos_result
-
-    - fail:
-
     - name: delete unnecesary distros
       command: >-
         cobbler distro remove \
@@ -45,13 +41,13 @@
            | map(attribute='name')
            | list }}
 
-    cobbler_distro_artifact_id: >-
-      cobbler_{{ cobbler_saved_iso
+    cobbler_artifact_result_fact: >-
+      artifact_result_cobbler_{{ cobbler_saved_iso
                  | regex_replace(" ", "")
                  | regex_replace("-", "_") }}
 
     cobbler_distro_iso_ckecksum: >-
-      {{ cobbler_download_isos_result[cobbler_distro_artifact_id].checksum }}
+      {{ cobbler_download_isos_result[cobbler_artifact_result_fact].checksum }}
   tags:
     - role::cobbler
     - role::cobbler::configure
