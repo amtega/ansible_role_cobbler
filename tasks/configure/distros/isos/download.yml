@@ -2,29 +2,12 @@
 # Download ISOs
 
 - block:
-    - name: download ISOs
+    - name: download distros artifacts
       include_role:
         name: amtega.artifact
       vars:
-        cobbler_distro_artifact_id: >-
-          cobbler_{{ cobbler_distro.name
-                     | regex_replace(" ", "")
-                     | regex_replace("-", "_") }}
-
-        override:
-          id: "{{ cobbler_distro_artifact_id }}"
-          dest: >-
-            {{ cobbler_iso_dir }}/{{ cobbler_distro.artifact.dest
-                                     | default("") }}
-
-        artifact: "{{ cobbler_distro.artifact | combine(override) }}"
-      when: >-
-        cobbler_distro.state == "present"
-        and cobbler_distro.name not in cobbler_saved_isos
-      loop: "{{ cobbler_distros }}"
-      loop_control:
-        loop_var: cobbler_distro
-        label: "{{ cobbler_distro.artifact.file }}"
+        artifact_list: >-
+          {{ lookup('template', 'artifacts.yml.j2') | from_yaml }}
 
     - name: setup fact with downloads result
       include_role:
@@ -33,7 +16,7 @@
         select_hostvars_pattern: "artifact_result_.*"
         select_hostvars_attributes: [ changed ]
         select_hostvars_fact_name: cobbler_download_isos_result
-        select_hostvars_output_type: list
+        select_hostvars_output_type: dict
 
     - name: update cobbler signatures
       command: cobbler signature update
@@ -41,7 +24,8 @@
       failed_when: >-
         '*** TASK COMPLETE ***' not in cobbler_signature_update_result.stdout
       when: >-
-        cobbler_download_isos_result | selectattr('changed') | list | length > 0
+        cobbler_download_isos_result.values()
+        | selectattr('changed') | list | length > 0
         or cobbler_umount_stalled_isos is changed
       notify:
         - synchronize cobbler

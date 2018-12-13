@@ -2,6 +2,10 @@
 # Cleanup distros
 
 - block:
+    - debug: var=cobbler_download_isos_result
+
+    - fail:
+
     - name: delete unnecesary distros
       command: >-
         cobbler distro remove \
@@ -16,17 +20,14 @@
         loop_var: cobbler_saved_iso
         label: "{{ cobbler_saved_iso }}"
 
-    - name: delete distros with ISOs checksum not matching with inventory
+    - name: delete distros not defined in inventory or with with bad checksums
       command: >-
         cobbler distro remove --name={{ cobbler_saved_iso }} --recursive
       when:
         - cobbler_saved_iso in cobbler_present_distros_names
         - >-
-          cobbler_saved_isos[cobbler_saved_iso]['iso_checksum']
-          not in cobbler_distros
-                 | selectattr('name', 'equalto', cobbler_saved_iso)
-                 | map(attribute='iso_checksum')
-                 | list
+          cobbler_saved_isos[cobbler_saved_iso]['iso_checksum'] | default('')
+          != cobbler_distro_iso_ckecksum
       loop: "{{ cobbler_saved_isos.keys() }}"
       loop_control:
         loop_var: cobbler_saved_iso
@@ -43,6 +44,14 @@
            | selectattr('state', 'equalto', 'absent')
            | map(attribute='name')
            | list }}
+
+    cobbler_distro_artifact_id: >-
+      cobbler_{{ cobbler_saved_iso
+                 | regex_replace(" ", "")
+                 | regex_replace("-", "_") }}
+
+    cobbler_distro_iso_ckecksum: >-
+      {{ cobbler_download_isos_result[cobbler_distro_artifact_id].checksum }}
   tags:
     - role::cobbler
     - role::cobbler::configure

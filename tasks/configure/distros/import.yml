@@ -1,8 +1,8 @@
 ---
 # Import distros
 
-- block:
-    - name: import distros
+- block:    
+    - name: import distros artifacts
       command: >-
         cobbler import
         --name={{ cobbler_distro_name }}
@@ -14,57 +14,44 @@
         | list
         | first
         not in cobbler_saved_isos
+      register: cobbler_import_result
       loop: >-
         {{ cobbler_search_iso_files_result.files
            | map(attribute="path")
            | list }}
       loop_control:
         loop_var: cobbler_iso_file
+        label: "{{ cobbler_iso_file | basename }}"
 
     - name: add ksmeta attributes to distros config
       command: >-
         cobbler distro edit
         --name={{ cobbler_distro_name }}
         --ksmeta='iso_file={{ cobbler_distro_file }}
-                  iso_checksum={{ cobbler_distros
-                                  | selectattr('artifact.file',
-                                               'equalto',
-                                                cobbler_iso_file | basename)
-                                  | map(attribute='iso_checksum')
-                                  | list
-                                  | first }}'
-      when: >-
-        cobbler_distros
-        | selectattr('artifact.file', 'equalto', cobbler_iso_file | basename)
-        | map(attribute='name')
-        | list
-        | first
-        not in cobbler_already_configure_distros_names
+                  iso_checksum={{ cobbler_distro_iso_ckecksum }}'
+      when: cobbler_import_result.results[cobbler_iso_file_index] is changed
       loop: >-
         {{ cobbler_search_iso_files_result.files
            | map(attribute="path")
            | list }}
       loop_control:
         loop_var: cobbler_iso_file
+        index_var: cobbler_iso_file_index
+        label: "{{ cobbler_iso_file | basename }}"
 
     - name: delete default profile created during distro import
       command: >-
         cobbler profile remove
         --name={{ cobbler_distro_name }}
         --recursive
-      when: >
-        cobbler_distros
-        | selectattr('artifact.file', 'equalto', cobbler_iso_file | basename)
-        | map(attribute='name')
-        | list
-        | first
-        not in cobbler_already_configure_distros_names
+      when: cobbler_import_result.results[cobbler_iso_file_index] is changed
       loop: >-
         {{ cobbler_search_iso_files_result.files
            | map(attribute="path")
            | list }}
       loop_control:
         loop_var: cobbler_iso_file
+        index_var: cobbler_iso_file_index
         label: "{{ cobbler_iso_file | basename }}"
   vars:
     cobbler_matched_distros: >-
@@ -83,7 +70,15 @@
       {{ cobbler_matched_distros
          | map(attribute='artifact.file')
          | list
-         | first  }}
+         | first }}
+
+    cobbler_distro_artifact_id: >-
+      cobbler_{{ cobbler_distro.name
+                 | regex_replace(" ", "")
+                 | regex_replace("-", "_") }}
+
+    cobbler_distro_iso_ckecksum: >-
+      {{ cobbler_download_isos_result[cobbler_distro_artifact_id].checksum }}
   tags:
     - role::cobbler
     - role::cobbler::configure
