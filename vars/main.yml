@@ -8,3 +8,7 @@ cobbler_main_config_dir: /etc/cobbler
 # Base directory to temporary mount ISOs
 
 cobbler_iso_mount_dir: "{{ cobbler_iso_dir }}/mounted"
+
+# Directory for kickstart files
+
+cobbler_kickstart_files_dir: /var/lib/cobbler/kickstarts

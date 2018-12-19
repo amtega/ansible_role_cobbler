@@ -1,0 +1,21 @@
+---
+# Add systems
+
+- block:
+    - name: add systems
+      command: >-
+        cobbler system add
+        --name={{ cobbler_system.name }}
+        --profile={{ cobbler_system.profile }}
+        --kopts="{{ cobbler_system.kopts | default([]) | join(' ') }}"
+      register: cobbler_system_add_result
+      loop: "{{ cobbler_updated_systems.values() }}"
+      loop_control:
+        loop_var: cobbler_system
+        label: "{{ cobbler_system.name }}"
+  vars:
+    cobbler_kickstart_file: "system_{{ cobbler_system.name }}.ks"
+  tags:
+    - role::cobbler
+    - role::cobbler::configure
+    - role::cobbler::configure::systems

@@ -14,7 +14,6 @@ A list of all the default variables for this role is available in `defaults/main
 
 - [amtega.check_platform](https://galaxy.ansible.com/amtega/check_platform)
 - [amtega.packages](https://galaxy.ansible.com/amtega/packages)
-- [amtega.select_hostvars](https://galaxy.ansible.com/amtega/select_hostvars)
 
 ## Example Playbook
 

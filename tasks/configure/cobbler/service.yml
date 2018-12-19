@@ -14,13 +14,6 @@
         state: started
         enabled: yes
 
-    - name: enable and start rsyncd service
-      service:
-        name: rsyncd
-        state: started
-        enabled: yes
-      when: ansible_facts.distribution_major_version is version("7", ">=")
-
     - name: download cobbler loaders
       command: cobbler get-loaders
       register: cobbler_rsync_result

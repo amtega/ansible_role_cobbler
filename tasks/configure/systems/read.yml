@@ -1,0 +1,24 @@
+---
+# Read systems
+
+- block:
+    - name: search systems config files
+      find:
+        paths: "{{ cobbler_config_dir }}/systems.d"
+        file_type: file
+      register: cobbler_search_systems_config_files_result
+
+    - name: read systems config files
+      shell: "cat {{ cobbler_system_config_file }}"
+      register: cobbler_read_systems_config_result
+      changed_when: false
+      loop: >-
+        {{ cobbler_search_systems_config_files_result.files
+           | map(attribute="path")
+           | list }}
+      loop_control:
+        loop_var: cobbler_system_config_file
+  tags:
+    - role::cobbler
+    - role::cobbler::configure
+    - role::cobbler::configure::systems

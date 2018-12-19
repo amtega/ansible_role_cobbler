@@ -63,7 +63,6 @@ cobbler_manage_rsync: no
 
 cobbler_next_server: "{{ ansible_facts.default_ipv4.address }}"
 
-
 cobbler_pxe_just_once: yes
 
 cobbler_pxe_template_dir: /etc/cobbler/pxe
@@ -115,9 +114,11 @@ cobbler_proxy_url_int: ""
 # List of dicts with the cobbler distros to manage. The format of the list items
 # is:
 #
-#  - name: <name of the distro>
-#    artifact: <artifact as defined in the amtega.artifact role>
-#    state: <can be present or absent>
+# {
+#   name: <name of the distro>
+#   artifact: <artifact as defined in the amtega.artifact role>
+#   state: <can be present or absent>
+# }
 
 # The ISO to used by each dist is specfied in the `artifact` attribute. Take a
 # look to `amtega.artifact` role documentation to known about supported types of
@@ -130,54 +131,83 @@ cobbler_proxy_url_int: ""
 #
 # Samples:
 #
-#  - name: CentOS-6-x86_64
-#    artifact:
-#      type: http
-#      host: http://ftp.cixug.es
-#      path: /CentOS/6/isos/x86_64
-#      file: CentOS-6.10-x86_64-minimal.iso
-#      dest: /
-#      timeout: 120
-#    state: present
+# cobbler_distros:
+#   - name: CentOS-6-x86_64
+#     artifact:
+#       type: http
+#       host: http://ftp.cixug.es
+#       path: /CentOS/6/isos/x86_64
+#       file: CentOS-6.10-x86_64-minimal.iso
+#       dest: /
+#       timeout: 120
+#     state: present
 #
-#  - name: CentOS-7-x86_64
-#    artifact:
-#      type: http
-#      host: http://ftp.cixug.es
-#      path: /CentOS/7/isos/x86_64
-#      file: CentOS-7-x86_64-Minimal-1810.iso
-#      dest: /
-#      timeout: 120
-#    state: present
+#   - name: CentOS-7-x86_64
+#     artifact:
+#       type: http
+#       host: http://ftp.cixug.es
+#       path: /CentOS/7/isos/x86_64
+#       file: CentOS-7-x86_64-Minimal-1810.iso
+#       dest: /
+#       timeout: 120
+#     state: present
 
-cobbler_distros:
+cobbler_distros: []
 
-# List of cobbler profiles to manage.
+# List of cobbler profiles to manage. The format of the list items is:
 #
-#
-# Format of the list items:
-#
-#  - name: name of the profile
-#    distro: name of the distro (must much with one of the defined distros)
-#    kickstart: full path to the kickstart file for the profile
-#    state: present or absent
+# {
+#   name: <name>                  # Name of the profile
+#   distro: <distro>              # Name of a previously defined distro
+#   kickstart: <path>             # Local filesystem path to a kickstart file.
+#                                 # Defaults to
+#                                 # /var/lib/cobbler/kickstarts/default.ks
+#   kickstart_content: <content>  # String with the content of the kickstart
+#                                 # file (optional)
+#   kopts: <kopts>                # Kernel command-line arguments (optional)
+#   parent: <profile>             # Parent profile (optional)
+#   proxy: <proxy>                # Proxy to use during the installation stage
+#   state: <state>                # Can be present or absent
+# }
 #
 # Samples:
 #
-#  - name: CentOS-6-x86_64
-#    distro: CentOS-6-x86_64
-#    kickstart: /var/lib/cobbler/kickstarts/centos6.ks
-#    state: present
+# cobbler_profiles:#
+#   - name: CentOS-6
+#     distro: CentOS-6-x86_64
+#     state: present
 #
-#  - name: CentOS-7-x86_64
-#    distro: CentOS-7-x86_64
-#    kickstart: /var/lib/cobbler/kickstarts/centos7.ks
-#    state: present
+#   - name: CentOS-7
+#     distro: CentOS-7-x86_64
+#     state: present
 
-cobbler_profiles:
+cobbler_profiles: []
+
+# List of cobbler systems to manage. The format of the list items is:
+#
+# {
+#   name: <name>         # Name of the system
+#   profile: <profile>   # Name of a previously defined profile
+#   kopts: <kopts>       # Kernel command-line arguments (optional)
+#   state: <state>       # Can be present or absent (optional)
+# }
+#
+#
+# Samples:
+#
+# cobbler_systems:
+#   - name: 192.168.5.6
+#     profile: CentOS-6
+#     state: present
+#
+#   - name: 192.168.5.7
+#     profile: CentOS-7
+#     state: present
+
+cobbler_systems: []
 
 # Delete unmanaged distros, profiles and ISOs if found. If true the role will
-# delete all distros,profiles and ISOs that are not part of the role config in
+# delete all distros, profiles and ISOs that are not part of the role config in
 # the inventory.
 
 cobbler_delete_unmanaged: true

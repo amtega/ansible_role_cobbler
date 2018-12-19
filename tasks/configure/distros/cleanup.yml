@@ -2,52 +2,77 @@
 # Cleanup distros
 
 - block:
-    - name: delete unnecesary distros
+    - include_tasks: read.yml
+
+    - name: umount distros ISO files from temporary directories
+      mount:
+        name: "{{ cobbler_iso_mount_dir }}/{{ cobbler_iso_file | basename }}"
+        src: "{{ cobbler_iso_file }}"
+        fstype: iso9660
+        opts: "loop,ro"
+        state: unmounted
+      loop: >-
+        {{ cobbler_search_iso_files_result.files
+           | map(attribute="path")
+           | list }}
+      loop_control:
+        loop_var: cobbler_iso_file
+      register: cobbler_umount_isos
+
+    - name: delete distros ISO files
+      file:
+        path: "{{ cobbler_iso_file }}"
+        state: absent
+      loop: >-
+        {{ cobbler_search_iso_files_result.files
+           | map(attribute="path")
+           | list }}
+      loop_control:
+        loop_var: cobbler_iso_file
+        label: "{{ cobbler_iso_file | basename }}"
+
+    - name: delete distros ISO files directories
+      file:
+        path: "{{ cobbler_iso_tmp_dir }}"
+        state: absent
+      loop: "{{ cobbler_search_iso_tmp_dirs_result.stdout_lines }}"
+      loop_control:
+        loop_var: cobbler_iso_tmp_dir
+
+    - name: delete distros to be updated or not found in inventory
       command: >-
         cobbler distro remove \
-        --name={{ cobbler_saved_iso }}
+        --name={{ cobbler_saved_distro.name }}
         --recursive
       when:
-        cobbler_saved_iso in cobbler_absent_distros_names
+        cobbler_saved_distro.name in cobbler_absent_distros_names
         or (cobbler_delete_unmanaged
-            and cobbler_saved_iso not in cobbler_present_distros_names)
-      loop: "{{ cobbler_saved_isos.keys() }}"
+            and cobbler_saved_distro.name not in cobbler_present_distros_names)
+        or cobbler_saved_distro.name in cobbler_updated_distros.keys()
+      register: cobbler_delete_distros_result
+      loop: "{{ cobbler_saved_distros.values() }}"
       loop_control:
-        loop_var: cobbler_saved_iso
-        label: "{{ cobbler_saved_iso }}"
+        loop_var: cobbler_saved_distro
+        label: "{{ cobbler_saved_distro.name }}"
+      vars:
+        cobbler_present_distros_names: >-
+            {{ cobbler_distros
+               | selectattr('state', 'equalto', 'present')
+               | map(attribute='name')
+               | list }}
 
-    - name: delete distros not defined in inventory or with with bad checksums
-      command: >-
-        cobbler distro remove --name={{ cobbler_saved_iso }} --recursive
+        cobbler_absent_distros_names: >-
+            {{ cobbler_distros
+               | selectattr('state', 'equalto', 'absent')
+               | map(attribute='name')
+               | list }}
+
+    - include_tasks: read.yml
       when:
-        - cobbler_saved_iso in cobbler_present_distros_names
-        - >-
-          cobbler_saved_isos[cobbler_saved_iso]['iso_checksum'] | default('')
-          != cobbler_distro_iso_ckecksum
-      loop: "{{ cobbler_saved_isos.keys() }}"
-      loop_control:
-        loop_var: cobbler_saved_iso
-        label: "{{ cobbler_saved_iso }}"
-  vars:
-    cobbler_present_distros_names: >-
-        {{ cobbler_distros
-           | selectattr('state', 'equalto', 'present')
-           | map(attribute='name')
-           | list }}
-
-    cobbler_absent_distros_names: >-
-        {{ cobbler_distros
-           | selectattr('state', 'equalto', 'absent')
-           | map(attribute='name')
-           | list }}
-
-    cobbler_artifact_result_fact: >-
-      artifact_result_cobbler_{{ cobbler_saved_iso
-                 | regex_replace(" ", "")
-                 | regex_replace("-", "_") }}
-
-    cobbler_distro_iso_ckecksum: >-
-      {{ cobbler_download_isos_result[cobbler_artifact_result_fact].checksum }}
+        cobbler_delete_distros_result.results
+        | select('changed')
+        | list
+        | length > 0
   tags:
     - role::cobbler
     - role::cobbler::configure

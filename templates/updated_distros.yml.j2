@@ -1,0 +1,12 @@
+{% set ns = namespace(found=false) %}
+{% for cobbler_distro in cobbler_distros | list %}
+{% set saved_distro = cobbler_saved_distros[cobbler_distro.name] | default({}) %}
+{% if saved_distro.keys() | length == 0
+      or saved_distro.ks_meta.iso_file | default(none) != cobbler_distro.artifact.file %}
+{% set ns.found = true %}
+'{{ cobbler_distro.name }}': {{ cobbler_distro | to_json }}
+{% endif %}
+{% endfor %}
+{% if not ns.found %}
+{}
+{% endif %}

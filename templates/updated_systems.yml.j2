@@ -1,0 +1,14 @@
+{% set ns = namespace(found=false) %}
+{% for cobbler_system in cobbler_systems | list %}
+{% set saved_system = cobbler_saved_systems[cobbler_system.name] | default({}) %}
+{% set default_kickstart = cobbler_kickstart_files_dir + "/" + "default.ks" %}
+{% if saved_system.keys() | length == 0
+      or saved_system.profile | default(none) != cobbler_system.profile | default(none)
+      or saved_system.kopts | default(none) != cobbler_system.kopts | default(none) %}
+{% set ns.found = true %}
+'{{ cobbler_system.name }}': {{ cobbler_system | to_json }}
+{% endif %}
+{% endfor %}
+{% if not ns.found %}
+{}
+{% endif %}

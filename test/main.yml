@@ -1,13 +1,24 @@
 ---
+# Tasks for testing role
 
-# - name: run idempotence test
-#   hosts: localhost
-#   roles:
-#     - role: docker_presets
-#     - role: docker_sandbox
-#       docker_sandbox_state: started
-#       docker_sandbox_idempotence_test: false
-#       docker_provisioner_container_privileged: true
+- name: configure docker sandbox environment
+  hosts: localhost
+  roles:
+    - role: amtega.docker_presets
+      docker_presets_images_json_query: >-
+        [? starts_with(name, `centos-7`)
+           || starts_with(name, `fedora-27`)
+           || starts_with(name, `fedora-28`) ]
+  tags:
+    - sandbox
+
+- name: run idempotence test
+  hosts: localhost
+  roles:
+    - role: amtega.docker_sandbox
+      docker_sandbox_state: started
+  tags:
+    - sandbox
 
 - name: retrieve distos ISO information
   hosts: localhost
@@ -17,62 +28,56 @@
         centos_6_baseurl: http://ftp.cixug.es/CentOS/6/isos/x86_64
         centos_7_baseurl: http://ftp.cixug.es/CentOS/7/isos/x86_64
 
-    - name: setup facts with info to to download sha1 files
+    - name: setup facts with info to download sha256 files
       set_fact:
-        sha1sum_files:
+        sha256sum_files:
           - url: "{{ centos_6_baseurl }}"
-            sha1sum: "sha1sum.txt"
+            sha256sum: "sha256sum.txt"
             dest: "{{ playbook_dir }}/CentOS-6-x86_64"
 
           - url: "{{ centos_7_baseurl }}"
-            sha1sum: "sha1sum.txt"
+            sha256sum: "sha256sum.txt"
             dest: "{{ playbook_dir }}/CentOS-7-x86_64"
 
-    - name: download sha1 files
+    - name: download sha256 files
       get_url:
-        url: "{{ item.url }}/{{ item.sha1sum }}"
+        url: "{{ item.url }}/{{ item.sha256sum }}"
         dest: "{{ item.dest }}"
         force: yes
         timeout: 60
-      loop: "{{ sha1sum_files }}"
+      loop: "{{ sha256sum_files }}"
       loop_control:
         label: "{{ item.dest }}"
 
-    - name: parse sha1 files
+    - name: parse sha256 files
       set_fact:
-        iso:
+        distro:
           - name: "{{ item.dest | basename }}"
-            iso_file: >-
-              {{ lookup("pipe",
-                        "sed -r 's# +# #g' "
-                        + item.dest
-                        + "| grep [Mm]inimal"
-                        + "| cut -f 2 -d' '" ) }}
-            iso_url: "{{ item.url }}"
-            iso_checksum: >-
+            artifact:
+              type: http
+              host: "http://{{ item.url | urlsplit('hostname') }}"
+              path: "{{ item.url | urlsplit('path') }}"
+              file: >-
                 {{ lookup("pipe",
                           "sed -r 's# +# #g' "
                           + item.dest
                           + "| grep [Mm]inimal"
-                          + "| cut -f 1 -d' '" ) }}
-            iso_checksum_algorithm: sha1
+                          + "| cut -f 2 -d' '" ) }}
             state: present
-      register: sha1_parse_result
-      loop: "{{ sha1sum_files }}"
+      register: sha256_parse_result
+      loop: "{{ sha256sum_files }}"
       loop_control:
         label: "{{ item.dest }}"
 
     - name: build cobbler_distros fact
       set_fact:
         cobbler_distros: >-
-          {{ sha1_parse_result.results
+          {{ sha256_parse_result.results
               | map(attribute="ansible_facts")
-              | sum("iso", [])
+              | sum("distro", [])
               | list }}
-
   tags:
     - all
-
 
 - name: test cobbler role
   hosts: docker_sandbox_containers
@@ -91,53 +96,56 @@
     cobbler_next_server: >-
       {{ hostvars[inventory_hostname]['ansible_eth0']['ipv4']['address'] }}
 
-    cobbler_distros: "{{ hostvars['localhost']['cobbler_distros'] }}"
+    cobbler_distros: "{{ hostvars.localhost.cobbler_distros }}"
 
     cobbler_profiles:
       - name: CentOS-6-x86_64
         distro: CentOS-6-x86_64
-        kickstart: /var/lib/cobbler/kickstarts/centos6.ks
+        kickstart_content: "%end"
+        state: present
 
       - name: CentOS-7-x86_64
         distro: CentOS-7-x86_64
-        kickstart: /var/lib/cobbler/kickstarts/centos7.ks
+        kickstart: /var/lib/cobbler/kickstarts/default.ks
+        state: present
 
+    cobbler_systems:
+      - name: 192.168.5.6
+        profile: CentOS-6-x86_64
+        state: present
+
+      - name: 192.168.5.7
+        profile: CentOS-7-x86_64
+        state: present
   roles:
     # Docker containers share loop devices with the host, so prior to applly the
     # cobbler role we need to provisione enough loop devices to allow the role
     # be able to mount ISO files
 
-    - role: dev
+    - role: amtega.dev
       dev_special_files: >-
         {{ loop_device_pattern
             | dev_expand(
               n=0 | dev_to(5 + groups['docker_sandbox_containers']
                             | length * (cobbler_distros | length))) }}
 
-    - role: cobbler
-
+    - role: amtega.cobbler
   tags:
     - idempotence
 
-
-#
-# FIX TAGS
-#
-
-
-
-
-# - name: cleanup docker docker sandbox and temporary data
-#   hosts: localhost
-#   roles:
-#     - role: docker_sandbox
-#       docker_sandbox_state: absent
-#
-#   tasks:
-#     - name: remove sha1 temporary files
-#       file:
-#         path: "{{ item.dest }}"
-#         state: absent
-#       loop: "{{ sha1sum_files }}"
-#       loop_control:
-#         label: "{{ item.dest }}"
+- name: cleanup docker sandbox
+  hosts: localhost
+  roles:
+    - role: amtega.docker_sandbox
+      docker_sandbox_state: absent
+  tasks:
+    - name: remove sha256 temporary files
+      file:
+        path: "{{ item.dest }}"
+        state: absent
+      loop: "{{ sha256sum_files }}"
+      loop_control:
+        label: "{{ item.dest }}"
+  tags:
+    - cleanup
+    - sandbox

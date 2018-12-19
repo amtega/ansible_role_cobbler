@@ -1,0 +1,16 @@
+---
+# Configure systems tasks
+
+- block:
+    - include_tasks: cleanup.yml
+    - include_tasks: add.yml
+  vars:
+    cobbler_saved_systems: >-
+      {{ lookup('template', 'saved_systems.yml.j2') | from_yaml }}
+    cobbler_updated_systems: >-
+      {{ lookup('template', 'updated_systems.yml.j2') | from_yaml }}
+  tags:
+    - role::cobbler
+    - role::cobbler::configure
+    - role::cobbler::configure::systems
+    - role::cobbler::configure::systems::cleanup

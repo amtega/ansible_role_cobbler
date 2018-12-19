@@ -1,0 +1,6 @@
+{% for item in cobbler_read_profiles_config_result.results | default([]) %}
+{% set item_yaml = item.stdout | from_json %}
+'{{ item_yaml.name }}': {{ item_yaml | to_json }}
+{% else %}
+{}
+{% endfor %}

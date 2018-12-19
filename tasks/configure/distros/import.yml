@@ -2,83 +2,107 @@
 # Import distros
 
 - block:
-    - name: import distros artifacts
+    - name: download distros ISO artifacts
+      include_role:
+        name: amtega.artifact
+      vars:
+        artifact_list: >-
+          {{ lookup('template', 'artifacts.yml.j2') | from_yaml }}
+
+    - name: create temporary mount directories for ISO files
+      file:
+        path: "{{ cobbler_iso_mount_dir }}/{{ cobbler_distro.artifact.file }}"
+        state: directory
+        owner: root
+        group: root
+        mode: 0755
+      register: cobbler_create_mount_dirs_result
+      loop: "{{ cobbler_updated_distros.values() }}"
+      loop_control:
+        loop_var: cobbler_distro
+        label: "{{ cobbler_distro.name }}"
+
+    - name: mount ISO files in temporary directories
+      mount:
+        fstype: iso9660
+        opts: "loop,ro"
+        src: >-
+          {{ [ cobbler_iso_dir,
+               cobbler_distro.artifact.dest | default(""),
+               cobbler_distro.artifact.file ] | join("/") }}
+        path: "{{ cobbler_iso_mount_dir }}/{{ cobbler_distro.artifact.file }}"
+        state: mounted
+      register: cobbler_mount_isos_result
+      loop: "{{ cobbler_updated_distros.values() }}"
+      loop_control:
+        loop_var: cobbler_distro
+        label: "{{ cobbler_distro.name }}"
+
+    - name: update cobbler signatures
+      command: cobbler signature update
+      register: cobbler_signature_update_result
+      failed_when: >-
+        '*** TASK COMPLETE ***' not in cobbler_signature_update_result.stdout
+      when: >-
+        artifact_result.values()
+        | select("changed")
+        | list
+        | length > 0
+      notify:
+        - restart cobblerd
+
+    - meta: flush_handlers
+
+    - name: import distros
       command: >-
         cobbler import
-        --name={{ cobbler_distro_name }}
-        --path={{ cobbler_iso_mount_dir }}/{{ cobbler_iso_file | basename }}
-      when: >
-        cobbler_distros
-        | selectattr('artifact.file', 'equalto', cobbler_iso_file | basename)
-        | map(attribute='name')
-        | list
-        | first
-        not in cobbler_saved_isos
+        --name={{ cobbler_distro.name }}
+        --path={{ cobbler_iso_mount_dir }}/{{ cobbler_distro.artifact.file }}
       register: cobbler_import_result
-      loop: >-
-        {{ cobbler_search_iso_files_result.files
-           | map(attribute="path")
-           | list }}
+      loop: "{{ cobbler_updated_distros.values() }}"
       loop_control:
-        loop_var: cobbler_iso_file
-        label: "{{ cobbler_iso_file | basename }}"
+        loop_var: cobbler_distro
+        label: "{{ cobbler_distro.name }}"
 
     - name: add ksmeta attributes to distros config
       command: >-
         cobbler distro edit
-        --name={{ cobbler_distro_name }}
-        --ksmeta='iso_file={{ cobbler_distro_file }}
-                  iso_checksum={{ cobbler_distro_iso_ckecksum }}'
-      when: cobbler_import_result.results[cobbler_iso_file_index] is changed
+        --name={{ cobbler_distro.name }}
+        --ksmeta='iso_file={{ cobbler_distro.artifact.file }}'
+      when: cobbler_import_result.results[cobbler_distro_index] is changed
+      register: cobbler_add_ksmeta_result
+      loop: "{{ cobbler_updated_distros.values() }}"
+      loop_control:
+        loop_var: cobbler_distro
+        index_var: cobbler_distro_index
+        label: "{{ cobbler_distro.name }}"
+
+    - name: umount distros ISO files from temporary directories
+      mount:
+        fstype: iso9660
+        opts: "loop,ro"
+        src: "{{ cobbler_iso_file }}"
+        name: "{{ cobbler_iso_mount_dir }}/{{ cobbler_iso_file | basename }}"
+        state: unmounted
+      register: cobbler_umount_isos_result
       loop: >-
         {{ cobbler_search_iso_files_result.files
            | map(attribute="path")
            | list }}
       loop_control:
         loop_var: cobbler_iso_file
-        index_var: cobbler_iso_file_index
-        label: "{{ cobbler_iso_file | basename }}"
 
-    - name: delete default profile created during distro import
-      command: >-
-        cobbler profile remove
-        --name={{ cobbler_distro_name }}
-        --recursive
-      when: cobbler_import_result.results[cobbler_iso_file_index] is changed
-      loop: >-
-        {{ cobbler_search_iso_files_result.files
-           | map(attribute="path")
-           | list }}
-      loop_control:
-        loop_var: cobbler_iso_file
-        index_var: cobbler_iso_file_index
-        label: "{{ cobbler_iso_file | basename }}"
-  vars:
-    cobbler_matched_distros: >-
-      {{ cobbler_distros
-         | selectattr('artifact.file',
-                      'equalto',
-                      cobbler_iso_file | basename) }}
-
-    cobbler_distro_name: >-
-      {{ cobbler_matched_distros
-         | map(attribute='name')
-         | list
-         | first }}
-
-    cobbler_distro_file: >-
-      {{ cobbler_matched_distros
-         | map(attribute='artifact.file')
-         | list
-         | first }}
-
-    cobbler_artifact_result_fact: >-
-      artifact_result_cobbler_{{ cobbler_distro.name
-                 | regex_replace(" ", "")
-                 | regex_replace("-", "_") }}
-
-    cobbler_distro_iso_ckecksum: >-
-      {{ cobbler_download_isos_result[cobbler_artifact_result_fact].checksum }}
+    - include_tasks: cleanup.yml
+      when:
+        ( artifact_result.values()
+        + cobbler_create_mount_dirs_result.results
+        + cobbler_mount_isos_result.results
+        + cobbler_import_result.results
+        + cobbler_add_ksmeta_result.results
+        + cobbler_umount_isos_result.results )
+        | select('changed')
+        | list
+        | length > 0
   tags:
     - role::cobbler
     - role::cobbler::configure

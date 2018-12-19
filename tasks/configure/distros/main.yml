@@ -2,21 +2,15 @@
 # Configure distros tasks
 
 - block:
-    - include_tasks: read.yml
-    - include_tasks: isos/cleanup.yml
-    - include_tasks: isos/download.yml
-    - include_tasks: isos/mount.yml
     - include_tasks: cleanup.yml
     - include_tasks: import.yml
-    - include_tasks: isos/umount.yml
   vars:
-    cobbler_saved_isos: >-
-      {{ lookup('template', 'saved_distros_isos.yml.j2') | from_yaml }}
+    cobbler_saved_distros: >-
+      {{ lookup('template', 'saved_distros.yml.j2') | from_yaml }}
+    cobbler_updated_distros: >-
+      {{ lookup('template', 'updated_distros.yml.j2') | from_yaml }}
   tags:
     - role::cobbler
     - role::cobbler::configure
     - role::cobbler::configure::distros
     - role::cobbler::configure::distros::cleanup
-    - role::cobbler::configure::distros::isos
-    - role::cobbler::configure::distros::isos::cleanup
-    - role::cobbler::configure::distros::isos::download

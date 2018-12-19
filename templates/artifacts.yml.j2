@@ -1,5 +1,4 @@
-{% for cobbler_distro in cobbler_distros
-                         | selectattr("state", "equalto", "present") %}
+{% for cobbler_distro in cobbler_updated_distros.values() %}
 {% set id = "cobbler_" + cobbler_distro.name | regex_replace(" ", "") | regex_replace("-", "_") %}
 {% set dest = cobbler_iso_dir + "/" + cobbler_distro.artifact.dest | default("") %}
 {% set override = { "id": id, "dest": dest } %}

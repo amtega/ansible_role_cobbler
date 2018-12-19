@@ -1,6 +1,0 @@
-{% for item in cobbler_read_distros_config_result.results | default([]) %}
-{% set item_yaml = item.stdout | from_json %}
-'{{ item_yaml.name }}':
-  'iso_file': '{{ item_yaml.ks_meta.iso_file | default("") }}'
-  'iso_checksum': '{{ item_yaml.ks_meta.iso_checksum | default("") }}'
-{% endfor %}

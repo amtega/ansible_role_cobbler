@@ -1,0 +1,38 @@
+---
+# Read profiles
+
+- block:
+    - name: search profiles config files
+      find:
+        paths: "{{ cobbler_config_dir }}/profiles.d"
+        file_type: file
+      register: cobbler_search_profiles_config_files_result
+
+    - name: read profiles config files
+      shell: "cat {{ cobbler_profile_config_file }}"
+      register: cobbler_read_profiles_config_result
+      changed_when: false
+      loop: >-
+        {{ cobbler_search_profiles_config_files_result.files
+           | map(attribute="path")
+           | list }}
+      loop_control:
+        loop_var: cobbler_profile_config_file
+        label: "{{ (cobbler_profile_config_file | basename | splitext).0 }}"
+
+    - name: read profiles kickstart files
+      shell: "cat {{ cobbler_kickstart_file_path }}"
+      register: cobbler_read_kickstarts_result
+      failed_when: false
+      changed_when: false
+      loop: >-
+        {{ cobbler_profiles
+           | selectattr('state', 'equalto', 'present')
+           | list }}
+      loop_control:
+        loop_var: cobbler_profile
+        label: "{{ cobbler_profile.name }}"
+  tags:
+    - role::cobbler
+    - role::cobbler::configure
+    - role::cobbler::configure::profiles
