@@ -31,6 +31,7 @@ dependencies:
     when: ansible_facts.distribution | lower in ["centos", "rhel"]
 
   - role: amtega.proxy_client
+
   - role: amtega.tftpd
 
   - role: amtega.xinetd_service
