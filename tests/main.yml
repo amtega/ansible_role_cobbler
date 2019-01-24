@@ -17,6 +17,7 @@
   roles:
     - role: amtega.docker_sandbox
       docker_sandbox_state: started
+      docker_sandbox_idempotence_test: no
   tags:
     - sandbox
 
@@ -79,6 +80,49 @@
   tags:
     - all
 
+- name: prepare docker containers for testing
+  hosts: docker_sandbox_containers
+  tasks:
+    - name: create file with cobbler distros config
+      copy:
+        content: "{{ hostvars.localhost.cobbler_distros | to_yaml }}"
+        dest: /tmp/distros.yml
+
+# Run idempotence test calling "manually" the idempotence_tester role
+
+- name: run idempotence test
+  hosts: localhost
+  roles:
+    - role: amtega.idempotence_tester
+      idempotence_tester_inventory: "{{ docker_sandbox_inventory }}"
+      idempotence_tester_group: docker_sandbox_containers
+      when: docker_sandbox_idempotence_test
+
+# Regenerate docker containers after running idempotence test
+
+- name: regenerate docker containers
+  hosts: localhost
+  roles:
+    - role: amtega.docker_sandbox
+      docker_sandbox_state: recreated
+      docker_sandbox_idempotence_test: false
+      when: docker_sandbox_idempotence_test
+
+- name: setup cobbler distros config
+  hosts: docker_sandbox_containers
+  tasks:
+    - name: read file with cobbler distros config
+      slurp:
+        src: /tmp/distros.yml
+      register: read_distros_config_result
+
+    - name: setup fact with cobbbler distros config
+      set_fact:
+          cobbler_distros: >-
+            {{ read_distros_config_result.content | b64decode | from_yaml }}
+  tags:
+    - idempotence
+
 - name: test cobbler role
   hosts: docker_sandbox_containers
   vars:
@@ -95,8 +139,6 @@
 
     cobbler_next_server: >-
       {{ hostvars[inventory_hostname]['ansible_eth0']['ipv4']['address'] }}
-
-    cobbler_distros: "{{ hostvars.localhost.cobbler_distros }}"
 
     cobbler_profiles:
       - name: CentOS-6-x86_64
