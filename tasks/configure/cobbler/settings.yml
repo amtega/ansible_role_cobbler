@@ -31,6 +31,11 @@
         mode: 0644
         backup: yes
       notify: restart cobblerd
+
+    - name: generate apache ssl certs
+      command: /usr/libexec/httpd-ssl-gencerts
+      args:
+        creates: /etc/pki/tls/certs/localhost.crt
   tags:
     - role::cobbler
     - role::cobbler::configure

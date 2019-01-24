@@ -18,10 +18,6 @@
         state: started
         enabled: yes
 
-    - name: generate apache ssl certs
-      command: /usr/libexec/httpd-ssl-gencerts
-      creates: /etc/pki/tls/certs/localhost.crt
-
     - name: enable and start httpd service
       service:
         name: httpd
