@@ -13,6 +13,10 @@ A list of all the default variables for this role is available in `defaults/main
 ## Dependencies
 
 - [amtega.check_platform](https://galaxy.ansible.com/amtega/check_platform)
+- [amtega.epel](https://galaxy.ansible.com/amtega/epel) for CentOS/RHEL systems
+- [amtega.proxy_client](https://galaxy.ansible.com/amtega/proxy_client)
+- [amtega.tftpd](https://galaxy.ansible.com/amtega/tftpd)
+- [amtega.xinetd](https://galaxy.ansible.com/amtega/xinetd)
 - [amtega.packages](https://galaxy.ansible.com/amtega/packages)
 
 ## Example Playbook

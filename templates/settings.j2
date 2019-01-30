@@ -1,6 +1,4 @@
-#
-# {{ ansible_managed }}
-#
+{{ ansible_managed | comment }}
 
 allow_duplicate_hostnames: {{ cobbler_allow_duplicate_hostnames | int }}
 allow_duplicate_ips: {{ cobbler_allow_duplicate_ips | int }}

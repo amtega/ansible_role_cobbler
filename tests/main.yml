@@ -80,15 +80,7 @@
   tags:
     - all
 
-- name: prepare docker containers for testing
-  hosts: docker_sandbox_containers
-  tasks:
-    - name: create file with cobbler distros config
-      copy:
-        content: "{{ hostvars.localhost.cobbler_distros | to_yaml }}"
-        dest: /tmp/distros.yml
-
-# Run idempotence test calling "manually" the idempotence_tester role
+- import_playbook: prepare.yml
 
 - name: run idempotence test
   hosts: localhost
@@ -96,9 +88,6 @@
     - role: amtega.idempotence_tester
       idempotence_tester_inventory: "{{ docker_sandbox_inventory }}"
       idempotence_tester_group: docker_sandbox_containers
-      when: docker_sandbox_idempotence_test
-
-# Regenerate docker containers after running idempotence test
 
 - name: regenerate docker containers
   hosts: localhost
@@ -106,7 +95,8 @@
     - role: amtega.docker_sandbox
       docker_sandbox_state: recreated
       docker_sandbox_idempotence_test: false
-      when: docker_sandbox_idempotence_test
+
+- import_playbook: prepare.yml
 
 - name: setup cobbler distros config
   hosts: docker_sandbox_containers

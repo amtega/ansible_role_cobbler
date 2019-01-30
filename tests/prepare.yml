@@ -1,0 +1,10 @@
+---
+# Prepare docker containers for testing
+
+- name: prepare docker containers for testing
+  hosts: docker_sandbox_containers
+  tasks:
+    - name: create file with cobbler distros config
+      copy:
+        content: "{{ hostvars.localhost.cobbler_distros | to_yaml }}"
+        dest: /tmp/distros.yml

@@ -55,7 +55,9 @@ dependencies:
           cobbler-web: present
           curl: present
           debmirror: present
+          hostname: present
           httpd: present
+          mod_ssl: present
           pykickstart: present
           which: present
           wget: present
