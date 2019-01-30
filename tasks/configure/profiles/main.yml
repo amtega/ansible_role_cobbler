@@ -1,0 +1,21 @@
+---
+# Configure profiles tasks
+
+- block:
+    - include_tasks: cleanup.yml
+    - include_tasks: add.yml
+  vars:
+    cobbler_saved_profiles: >-
+      {{ lookup('template', 'saved_profiles.yml.j2') | from_yaml }}
+    cobbler_saved_kickstarts: >-
+      {{ lookup('template', 'saved_kickstarts.yml.j2') | from_yaml }}
+    cobbler_updated_profiles: >-
+      {{ lookup('template', 'updated_profiles.yml.j2') | from_yaml }}
+    cobbler_kickstart_file: "profile_{{ cobbler_profile.name }}.ks"
+    cobbler_kickstart_file_path: >-
+      {{ cobbler_kickstart_files_dir }}/{{ cobbler_kickstart_file }}
+  tags:
+    - role::cobbler
+    - role::cobbler::configure
+    - role::cobbler::configure::profiles
+    - role::cobbler::configure::profiles::cleanup

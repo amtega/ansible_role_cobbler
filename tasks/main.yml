@@ -2,34 +2,19 @@
 # Role tasks
 
 - name: install cobbler
-  include_tasks: install.yml
+  include_tasks: install/main.yml
   tags:
     - role::cobbler
     - role::cobbler::install
 
 - name: configure cobbler
-  include_tasks: configure.yml
+  include_tasks: configure/main.yml
   tags:
     - role::cobbler
     - role::cobbler::configure
-    - role::cobbler::configure::settings
-
-- name: enable cobbler service
-  include_tasks: service.yml
-  tags:
-    - role::cobbler
-    - role::cobbler::service
-
-- name: setup cobbler distros
-  include_tasks: setup_distros.yml
-  tags:
-    - role::cobbler
-    - role::cobbler::configure
-    - role::cobbler::distros
-
-# - name: configure cobbler profles
-#   include_tasks: setup_profiles.yml
-#   tags:
-#     - role::cobbler
-#     - role::cobbler::configure
-#     - role::cobbler::profiles
+    - role::cobbler::configure::service
+    - role::cobbler::configure::distros
+    - role::cobbler::configure::distros::cleanup
+    - role::cobbler::configure::distros::isos
+    - role::cobbler::configure::distros::isos::cleanup
+    - role::cobbler::configure::distros::isos::download

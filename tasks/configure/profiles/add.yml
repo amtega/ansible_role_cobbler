@@ -1,0 +1,42 @@
+---
+# Add profiles
+
+- block:
+    - name: create profiles kickstart files
+      copy:
+        dest: "{{ cobbler_kickstart_files_dir }}/{{ cobbler_kickstart_file }}"
+        content: "{{ cobbler_profile.kickstart_content }}"
+      register: cobbler_kickstart_add_result
+      when: cobbler_profile.kickstart_content is defined
+      loop: "{{ cobbler_updated_profiles.values() }}"
+      loop_control:
+        loop_var: cobbler_profile
+        label: "{{ cobbler_profile.name }}"
+
+    - name: add profiles
+      command: >-
+        cobbler profile add
+        --name={{ cobbler_profile.name }}
+        --distro={{ cobbler_profile.distro }}
+        --kopts="{{ cobbler_profile.kopts | default([]) | join(' ') }}"
+        {{ (cobbler_profile_kickstart | length > 0)
+           | ternary("--kickstart=" + cobbler_profile_kickstart, "") }}
+        {{ (cobbler_profile.parent | default('') | length > 0)
+           | ternary("--parent=" + cobbler_profile.parent | default(''), "") }}
+        {{ (cobbler_profile.proxy | default('') | length > 0)
+           | ternary("--proxy=" + cobbler_profile.proxy | default(''), "") }}
+      register: cobbler_profile_add_result
+      loop: "{{ cobbler_updated_profiles.values() }}"
+      loop_control:
+        loop_var: cobbler_profile
+        label: "{{ cobbler_profile.name }}"
+      vars:
+        cobbler_profile_kickstart: >-
+          {{ (cobbler_profile.kickstart_content | default("") | length > 0)
+             | ternary(cobbler_kickstart_file_path,
+                       (cobbler_profile.kickstart | default("") | length > 0)
+                       | ternary(cobbler_profile.kickstart, "")) }}
+  tags:
+    - role::cobbler
+    - role::cobbler::configure
+    - role::cobbler::configure::profiles

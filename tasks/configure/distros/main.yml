@@ -1,0 +1,16 @@
+---
+# Configure distros tasks
+
+- block:
+    - include_tasks: cleanup.yml
+    - include_tasks: import.yml
+  vars:
+    cobbler_saved_distros: >-
+      {{ lookup('template', 'saved_distros.yml.j2') | from_yaml }}
+    cobbler_updated_distros: >-
+      {{ lookup('template', 'updated_distros.yml.j2') | from_yaml }}
+  tags:
+    - role::cobbler
+    - role::cobbler::configure
+    - role::cobbler::configure::distros
+    - role::cobbler::configure::distros::cleanup

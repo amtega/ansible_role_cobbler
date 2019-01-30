@@ -1,0 +1,31 @@
+---
+# Configure tasks
+
+- name: configure cobbler
+  include_tasks: cobbler/main.yml
+  tags:
+    - role::cobbler
+    - role::cobbler::configure
+    - role::cobbler::configure::service
+
+- name: configure cobbler distros
+  include_tasks: distros/main.yml
+  tags:
+    - role::cobbler
+    - role::cobbler::configure
+    - role::cobbler::configure::distros
+    - role::cobbler::configure::distros::cleanup
+
+- name: configure cobbler profiles
+  include_tasks: profiles/main.yml
+  tags:
+    - role::cobbler
+    - role::cobbler::configure
+    - role::cobbler::configure::profiles
+
+- name: configure cobbler systems
+  include_tasks: systems/main.yml
+  tags:
+    - role::cobbler
+    - role::cobbler::configure
+    - role::cobbler::configure::systems

@@ -1,0 +1,19 @@
+{% set ns = namespace(found=false) %}
+{% for cobbler_profile in cobbler_profiles | list %}
+{% set saved_profile = cobbler_saved_profiles[cobbler_profile.name] | default({}) %}
+{% set default_kickstart = cobbler_kickstart_files_dir + "/" + "default.ks" %}
+{% if saved_profile.keys() | length == 0
+      or saved_profile.distro | default(none) != cobbler_profile.distro | default(none)
+      or cobbler_saved_kickstarts[cobbler_profile.name] | default("") | trim | to_json != cobbler_profile.kickstart_content | default("") | trim | to_json
+      or (cobbler_profile.kickstart_content | default('') | length == 0
+          and saved_profile.kickstart | default(default_kickstart) != cobbler_profile.kickstart | default(default_kickstart))
+      or saved_profile.kopts | default(none) != cobbler_profile.kopts | default(none)
+      or saved_profile.parent | default("") != cobbler_profile.parent | default("")
+      or saved_profile.proxy | default(none) != cobbler_profile.proxy | default(none) %}
+{% set ns.found = true %}
+'{{ cobbler_profile.name }}': {{ cobbler_profile | to_json }}
+{% endif %}
+{% endfor %}
+{% if not ns.found %}
+{}
+{% endif %}

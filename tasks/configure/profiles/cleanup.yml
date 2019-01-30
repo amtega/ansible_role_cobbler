@@ -1,0 +1,44 @@
+---
+# Cleanup profiles
+
+- block:
+    - include_tasks: read.yml
+
+    - name: delete profiles to be updated or not found in inventory
+      command: >-
+        cobbler profile remove \
+        --name={{ cobbler_saved_profile.name }}
+        --recursive
+      when:
+        cobbler_saved_profile.name in cobbler_absent_profiles_names
+        or (cobbler_delete_unmanaged
+            and cobbler_saved_profile.name not in cobbler_present_profiles_names)
+        or cobbler_saved_profile.name in cobbler_updated_profiles.keys()
+      register: cobbler_delete_profiles_result
+      loop: "{{ cobbler_saved_profiles.values() }}"
+      loop_control:
+        loop_var: cobbler_saved_profile
+        label: "{{ cobbler_saved_profile.name }}"
+      vars:
+        cobbler_present_profiles_names: >-
+            {{ cobbler_profiles
+               | selectattr('state', 'equalto', 'present')
+               | map(attribute='name')
+               | list }}
+
+        cobbler_absent_profiles_names: >-
+            {{ cobbler_profiles
+               | selectattr('state', 'equalto', 'absent')
+               | map(attribute='name')
+               | list }}
+
+    - include_tasks: read.yml
+      when:
+        cobbler_delete_profiles_result.results
+        | select('changed')
+        | list
+        | length > 0
+  tags:
+    - role::cobbler
+    - role::cobbler::configure
+    - role::cobbler::configure::profiles

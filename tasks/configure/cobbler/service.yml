@@ -1,0 +1,36 @@
+---
+# Configure service tasks
+
+- block:
+    - name: configure cobbler selinux booleans
+      seboolean:
+        name: "{{ cobbler_selinux_bool }}"
+        state: yes
+        persistent: yes
+      loop: "{{ cobbler_selinux_booleans }}"
+      loop_control:
+        loop_var: cobbler_selinux_bool
+      when: ansible_facts.selinux.status == "enabled"
+
+    - name: enable and start cobblerd service
+      service:
+        name: cobblerd
+        state: started
+        enabled: yes
+
+    - name: enable and start httpd service
+      service:
+        name: httpd
+        state: started
+        enabled: yes
+
+    - name: download cobbler loaders
+      command: cobbler get-loaders
+      register: cobbler_rsync_result
+      changed_when: cobbler_rsync_result.stdout is search("downloading")
+
+    - meta: flush_handlers
+  tags:
+    - role::cobbler
+    - role::cobbler::configure
+    - role::cobbler::configure::service

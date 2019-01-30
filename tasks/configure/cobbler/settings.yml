@@ -1,0 +1,42 @@
+---
+#  Setup cobbler settings files
+
+- block:
+    - name: configure /etc/cobbler/settings
+      template:
+        src: settings.j2
+        dest: "{{ cobbler_main_config_dir }}/settings"
+        owner: root
+        group: root
+        mode: 0644
+        backup: yes
+      notify: restart cobblerd
+
+    - name: configure /etc/cobbler/modules.conf
+      template:
+        src: modules.conf.j2
+        dest: "{{ cobbler_main_config_dir }}/modules.conf"
+        owner: root
+        group: root
+        mode: 0644
+        backup: yes
+      notify: restart cobblerd
+
+    - name: configure /etc/debmirror.conf
+      template:
+        src: debmirror.conf.j2
+        dest: /etc/debmirror.conf
+        owner: root
+        group: root
+        mode: 0644
+        backup: yes
+      notify: restart cobblerd
+
+    - name: generate apache ssl certs
+      command: /usr/libexec/httpd-ssl-gencerts
+      args:
+        creates: /etc/pki/tls/certs/localhost.crt
+  tags:
+    - role::cobbler
+    - role::cobbler::configure
+    - role::cobbler::configure::settings

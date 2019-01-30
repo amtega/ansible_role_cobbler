@@ -1,75 +1,213 @@
 ---
 # Role default lower priority variables
 
-#
-# Cobbler general config
-#
+# Cobbler config directory
 
-cobbler_default_password_crypted: "$1$hZtCu.xn$OcfOoLF7907a.3rd73PqK1"
-cobbler_next_server: "{{ ansible_default_ipv4.address }}"
-cobbler_server: "{{ ansible_default_ipv4.address }}"
 cobbler_config_dir: /var/lib/cobbler/config
+
+# Cobbler temporary directory
+
 cobbler_tmp_dir: /var/lib/cobbler/tmp
+
+# Cobbler ISOs directory
+
 cobbler_iso_dir: "{{ cobbler_tmp_dir }}/iso"
-cobbler_internet_proxy_http: "{{ gnu_linux_internet_proxy_http }}"
-cobbler_internet_proxy_https: "{{ gnu_linux_internet_proxy_https }}"
-cobbler_download_timeout: 120
 
+# Cobbler own settings. These settings have the same meaning that the ones
+# detailed in the cobbler documentation, but here they are prefixed by
+# "cobbler_"
+
+cobbler_allow_duplicate_hostnames: no
+cobbler_allow_duplicate_ips: no
+cobbler_allow_duplicate_macs: no
+cobbler_allow_dynamic_settings: no
+
+cobbler_anamon_enabled: no
+
+cobbler_authn_pam_service: login
+cobbler_auth_token_expiration: 3600
+
+cobbler_cheetah_import_whitelist:
+ - random
+ - re
+ - time
+
+cobbler_createrepo_flags: -c cache -s sha
+
+cobbler_default_kickstart: /var/lib/cobbler/kickstarts/default.ks
+
+cobbler_default_name_servers: []
+
+cobbler_default_ownership:
+ - admin
+
+cobbler_default_password_crypted: $1$hZtCu.xn$OcfOoLF7907a.3rd73PqK1
+
+cobbler_default_template_type: cheetah
+
+cobbler_enable_gpxe: no
+
+cobbler_enable_menu: yes
+
+cobbler_http_port: 80
+
+cobbler_kernel_options:
+ ksdevice: bootif
+ lang: ' '
+ text: ~
+
+cobbler_manage_dhcp: no
+cobbler_manage_dns: no
+cobbler_manage_tftpd: no
+cobbler_manage_rsync: no
+
+cobbler_next_server: "{{ ansible_facts.default_ipv4.address }}"
+
+cobbler_pxe_just_once: yes
+
+cobbler_pxe_template_dir: /etc/cobbler/pxe
+
+cobbler_consoles: /var/consoles
+
+cobbler_redhat_management_type: off
+cobbler_redhat_management_server: xmlrpc.rhn.redhat.com
+cobbler_redhat_management_key: ""
+cobbler_redhat_management_permissive: no
+
+cobbler_register_new_installs: no
+
+cobbler_reposync_flags: -l -n -d
+
+cobbler_restart_dns: yes
+cobbler_restart_dhcp: yes
+
+cobbler_run_install_triggers: yes
+
+cobbler_server: "{{ ansible_facts.default_ipv4.address }}"
+
+cobbler_client_use_localhost: no
+cobbler_client_use_https: no
+
+cobbler_snippetsdir: /var/lib/cobbler/snippets
+
+cobbler_template_remote_kickstarts: no
+
+cobbler_webdir: /var/www/cobbler
+
+cobbler_xmlrpc_port: 25151
+
+cobbler_yum_post_install_mirror: yes
+cobbler_yum_distro_priority: yes
+cobbler_yumdownloader_flags: --resolve
+
+cobbler_serializer_pretty_json: no
+
+cobbler_replicate_rsync_options: -avzH
+cobbler_replicate_repo_rsync_options: -avzH
+
+cobbler_always_write_dhcp_entries: no
+
+cobbler_proxy_url_ext: >-
+  {{ proxy_client_http_proxy | default(proxy_client_https_proxy) }}
+cobbler_proxy_url_int: ""
+
+# List of dicts with the cobbler distros to manage. The format of the list items
+# is:
 #
-# List of cobbler distros to manage.
+# {
+#   name: <name of the distro>
+#   artifact: <artifact as defined in the amtega.artifact role>
+#   state: <can be present or absent>
+# }
+
+# The ISO to used by each dist is specfied in the `artifact` attribute. Take a
+# look to `amtega.artifact` role documentation to known about supported types of
+# artifacts, their specific settings and how to configure a proxy if necessary.
 #
+# The artifact attribute `id` is overriden by this role.
 #
-# Format of the list items:
-#
-#  - name: name of the distro
-#    iso_file: name of the iso file without path
-#    iso_url: http iso url without the filename
-#    iso_checksum: the checksum of the iso file
-#    iso_checksum_algorithm: md5 or sha1
+# The artifact attribute `dest` is relative to the directory specified in
+# `cobbler_iso_dir` variable.
 #
 # Samples:
 #
-#  - name: CentOS-6-x86_64
-#    iso_file: CentOS-6.7-x86_64-minimal.iso
-#    iso_url: "http://ftp.cixug.es/CentOS/6/isos/x86_64"
-#    iso_checksum: "9381a24b8bee2fed0c26896141a64b69"
-#    iso_checksum_algorithm: md5
+# cobbler_distros:
+#   - name: CentOS-6-x86_64
+#     artifact:
+#       type: http
+#       host: http://ftp.cixug.es
+#       path: /CentOS/6/isos/x86_64
+#       file: CentOS-6.10-x86_64-minimal.iso
+#       dest: /
+#       timeout: 120
+#     state: present
 #
-#  - name: CentOS-7-x86_64
-#    iso_file: CentOS-7-x86_64-Minimal-1511.iso
-#    iso_url: "http://ftp.cixug.es/CentOS/7/isos/x86_64"
-#    iso_checksum: "88c0437f0a14c6e2c94426df9d43cd67"
-#    iso_checksum_algorithm: md5
+#   - name: CentOS-7-x86_64
+#     artifact:
+#       type: http
+#       host: http://ftp.cixug.es
+#       path: /CentOS/7/isos/x86_64
+#       file: CentOS-7-x86_64-Minimal-1810.iso
+#       dest: /
+#       timeout: 120
+#     state: present
 
-cobbler_distros:
+cobbler_distros: []
 
+# List of cobbler profiles to manage. The format of the list items is:
 #
-# List of cobbler profiles to manage.
-#
-#
-# Format of the list items:
-#
-#  - name: name of the profile
-#    distro: name of the distro (must much with one of the defined distros)
-#    kickstart: full path to the kickstart file for the profile
-#    state: present or absent
+# {
+#   name: <name>                  # Name of the profile
+#   distro: <distro>              # Name of a previously defined distro
+#   kickstart: <path>             # Local filesystem path to a kickstart file.
+#                                 # Defaults to
+#                                 # /var/lib/cobbler/kickstarts/default.ks
+#   kickstart_content: <content>  # String with the content of the kickstart
+#                                 # file (optional)
+#   kopts: <kopts>                # Kernel command-line arguments (optional)
+#   parent: <profile>             # Parent profile (optional)
+#   proxy: <proxy>                # Proxy to use during the installation stage
+#   state: <state>                # Can be present or absent
+# }
 #
 # Samples:
 #
-#  - name: CentOS-6-x86_64
-#    distro: CentOS-6-x86_64
-#    kickstart: /var/lib/cobbler/kickstarts/centos6.ks
-#    state: present
+# cobbler_profiles:#
+#   - name: CentOS-6
+#     distro: CentOS-6-x86_64
+#     state: present
 #
-#  - name: CentOS-7-x86_64
-#    distro: CentOS-7-x86_64
-#    kickstart: /var/lib/cobbler/kickstarts/centos7.ks
-#    state: present
+#   - name: CentOS-7
+#     distro: CentOS-7-x86_64
+#     state: present
 
-cobbler_profiles:
+cobbler_profiles: []
+
+# List of cobbler systems to manage. The format of the list items is:
+#
+# {
+#   name: <name>         # Name of the system
+#   profile: <profile>   # Name of a previously defined profile
+#   kopts: <kopts>       # Kernel command-line arguments (optional)
+#   state: <state>       # Can be present or absent (optional)
+# }
+#
+#
+# Samples:
+#
+# cobbler_systems:
+#   - name: 192.168.5.6
+#     profile: CentOS-6
+#     state: present
+#
+#   - name: 192.168.5.7
+#     profile: CentOS-7
+#     state: present
+
+cobbler_systems: []
 
 # Delete unmanaged distros, profiles and ISOs if found. If true the role will
-# delete all distros,profiles and ISOs that are not part of the role config in
+# delete all distros, profiles and ISOs that are not part of the role config in
 # the inventory.
 
 cobbler_delete_unmanaged: true

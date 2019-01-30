@@ -1,96 +1,87 @@
-#
-# {{ ansible_managed }}
-#
+{{ ansible_managed | comment }}
 
-allow_duplicate_hostnames: 0
-allow_duplicate_ips: 0
-allow_duplicate_macs: 0
-allow_dynamic_settings: 0
+allow_duplicate_hostnames: {{ cobbler_allow_duplicate_hostnames | int }}
+allow_duplicate_ips: {{ cobbler_allow_duplicate_ips | int }}
+allow_duplicate_macs: {{ cobbler_allow_duplicate_macs | int }}
+allow_dynamic_settings: {{ cobbler_allow_dynamic_settings | int }}
 
-anamon_enabled: 0
+anamon_enabled: {{ cobbler_anamon_enabled | int }}
 
-authn_pam_service: "login"
-auth_token_expiration: 3600
+authn_pam_service: {{ cobbler_authn_pam_service }}
+auth_token_expiration: {{ cobbler_auth_token_expiration }}
 
-cheetah_import_whitelist:
- - "random"
- - "re"
- - "time"
+cheetah_import_whitelist: {{ cobbler_cheetah_import_whitelist | to_yaml }}
 
-createrepo_flags: "-c cache -s sha"
+createrepo_flags: {{ cobbler_createrepo_flags }}
 
-default_kickstart: /var/lib/cobbler/kickstarts/default.ks
+default_kickstart: {{ cobbler_default_kickstart }}
 
-default_name_servers: []
+default_name_servers: {{ cobbler_default_name_servers | to_yaml }}
 
-default_ownership:
- - "admin"
+default_ownership: {{ cobbler_default_ownership | to_yaml }}
 
 default_password_crypted: {{ cobbler_default_password_crypted }}
 
-default_template_type: "cheetah"
+default_template_type: {{ cobbler_default_template_type }}
 
-enable_gpxe: 0
+enable_gpxe: {{ cobbler_enable_gpxe | int }}
 
-enable_menu: 1
+enable_menu: {{ cobbler_enable_menu | int }}
 
-http_port: 80
+http_port: {{ cobbler_http_port }}
 
-kernel_options:
- ksdevice: bootif
- lang: ' '
- text: ~
+kernel_options: {{ cobbler_kernel_options | to_yaml }}
 
-manage_dhcp: 0
-manage_dns: 0
-manage_tftpd: 0
-manage_rsync: 0
+manage_dhcp: {{ cobbler_manage_dhcp | int }}
+manage_dns: {{ cobbler_manage_dns | int }}
+manage_tftpd: {{ cobbler_manage_tftpd | int }}
+manage_rsync: {{ cobbler_manage_rsync | int }}
 
-next_server: "{{ cobbler_next_server }}"
+next_server: {{ cobbler_next_server }}
 
-pxe_just_once: 1
+pxe_just_once: {{ cobbler_pxe_just_once | int }}
 
-pxe_template_dir: "/etc/cobbler/pxe"
+pxe_template_dir: {{ cobbler_pxe_template_dir }}
 
-consoles: "/var/consoles"
+consoles: {{ cobbler_consoles }}
 
-redhat_management_type: "off"
-redhat_management_server: "xmlrpc.rhn.redhat.com"
-redhat_management_key: ""
-redhat_management_permissive: 0
+redhat_management_type: {{ cobbler_redhat_management_type }}
+redhat_management_server: {{ cobbler_redhat_management_server }}
+redhat_management_key: {{ cobbler_redhat_management_key }}
+redhat_management_permissive: {{ cobbler_redhat_management_permissive | int }}
 
-register_new_installs: 0
+register_new_installs: {{ cobbler_register_new_installs | int }}
 
-reposync_flags: "-l -n -d"
+reposync_flags: {{ cobbler_reposync_flags }}
 
-restart_dns: 1
-restart_dhcp: 1
+restart_dns: {{ cobbler_restart_dns | int }}
+restart_dhcp: {{ cobbler_restart_dhcp | int }}
 
-run_install_triggers: 1
+run_install_triggers: {{ cobbler_run_install_triggers | int }}
 
-server: "{{ cobbler_server }}"
+server: {{ cobbler_server }}
 
-client_use_localhost: 0
-client_use_https: 0
+client_use_localhost: {{ cobbler_client_use_localhost | int }}
+client_use_https: {{ cobbler_client_use_https | int }}
 
-snippetsdir: /var/lib/cobbler/snippets
+snippetsdir: {{ cobbler_snippetsdir }}
 
-template_remote_kickstarts: 0
+template_remote_kickstarts: {{ cobbler_template_remote_kickstarts | int }}
 
-webdir: /var/www/cobbler
+webdir: {{ cobbler_webdir }}
 
-xmlrpc_port: 25151
+xmlrpc_port: {{ cobbler_xmlrpc_port }}
 
-yum_post_install_mirror: 1
-yum_distro_priority: 1
-yumdownloader_flags: "--resolve"
+yum_post_install_mirror: {{ cobbler_yum_post_install_mirror | int }}
+yum_distro_priority: {{ cobbler_yum_post_install_mirror | int }}
+yumdownloader_flags: {{ cobbler_yumdownloader_flags }}
 
-serializer_pretty_json: 0
+serializer_pretty_json: {{ cobbler_serializer_pretty_json | int }}
 
-replicate_rsync_options: "-avzH"
-replicate_repo_rsync_options: "-avzH"
+replicate_rsync_options: {{ cobbler_replicate_rsync_options }}
+replicate_repo_rsync_options: {{ cobbler_replicate_repo_rsync_options }}
 
-always_write_dhcp_entries: 0
+always_write_dhcp_entries: {{ cobbler_always_write_dhcp_entries | int }}
 
-proxy_url_ext: "{{ cobbler_internet_proxy_http }}"
-proxy_url_int: ""
+proxy_url_ext: {{ cobbler_proxy_url_ext }}
+proxy_url_int: {{ cobbler_proxy_url_int }}
