@@ -13,9 +13,9 @@
         cobbler_saved_system.name in cobbler_absent_systems_names
         or (cobbler_delete_unmanaged
             and cobbler_saved_system.name not in cobbler_present_systems_names)
-        or cobbler_saved_system.name in cobbler_updated_systems.keys()
+        or cobbler_saved_system.name in cobbler_updated_systems.keys() | list
       register: cobbler_delete_systems_result
-      loop: "{{ cobbler_saved_systems.values() }}"
+      loop: "{{ cobbler_saved_systems.values() | list }}"
       loop_control:
         loop_var: cobbler_saved_system
         label: "{{ cobbler_saved_system.name }}"
