@@ -17,7 +17,7 @@
         group: root
         mode: 0755
       register: cobbler_create_mount_dirs_result
-      loop: "{{ cobbler_updated_distros.values() }}"
+      loop: "{{ cobbler_updated_distros.values() | list }}"
       loop_control:
         loop_var: cobbler_distro
         label: "{{ cobbler_distro.name }}"
@@ -33,7 +33,7 @@
         path: "{{ cobbler_iso_mount_dir }}/{{ cobbler_distro.artifact.file }}"
         state: mounted
       register: cobbler_mount_isos_result
-      loop: "{{ cobbler_updated_distros.values() }}"
+      loop: "{{ cobbler_updated_distros.values() | list }}"
       loop_control:
         loop_var: cobbler_distro
         label: "{{ cobbler_distro.name }}"
@@ -59,7 +59,7 @@
         --name={{ cobbler_distro.name }}
         --path={{ cobbler_iso_mount_dir }}/{{ cobbler_distro.artifact.file }}
       register: cobbler_import_result
-      loop: "{{ cobbler_updated_distros.values() }}"
+      loop: "{{ cobbler_updated_distros.values() | list }}"
       loop_control:
         loop_var: cobbler_distro
         label: "{{ cobbler_distro.name }}"
@@ -71,7 +71,7 @@
         --ksmeta='iso_file={{ cobbler_distro.artifact.file }}'
       when: cobbler_import_result.results[cobbler_distro_index] is changed
       register: cobbler_add_ksmeta_result
-      loop: "{{ cobbler_updated_distros.values() }}"
+      loop: "{{ cobbler_updated_distros.values() | list }}"
       loop_control:
         loop_var: cobbler_distro
         index_var: cobbler_distro_index
@@ -94,12 +94,12 @@
 
     - include_tasks: cleanup.yml
       when:
-        ( artifact_result.values()
-        + cobbler_create_mount_dirs_result.results
-        + cobbler_mount_isos_result.results
-        + cobbler_import_result.results
-        + cobbler_add_ksmeta_result.results
-        + cobbler_umount_isos_result.results )
+        (artifact_result.values() | list
+         + cobbler_create_mount_dirs_result.results
+         + cobbler_mount_isos_result.results
+         + cobbler_import_result.results
+         + cobbler_add_ksmeta_result.results
+         + cobbler_umount_isos_result.results)
         | select('changed')
         | list
         | length > 0
