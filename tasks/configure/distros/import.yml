@@ -2,12 +2,16 @@
 # Import distros
 
 - block:
+    - name: setup fact with distros ISO artifacts
+      set_fact:
+        cobbler_distros_artifacts: >-
+          {{ lookup("template", "artifacts.yml.j2") | from_yaml }}
+
     - name: download distros ISO artifacts
       include_role:
         name: amtega.artifact
       vars:
-        artifact_list: >-
-          {{ lookup('template', 'artifacts.yml.j2') | from_yaml }}
+        artifact_list: "{{ cobbler_distros_artifacts }}"
 
     - name: create temporary mount directories for ISO files
       file:
