@@ -22,10 +22,11 @@ galaxy_info:
 
 dependencies:
   - role: amtega.check_platform
-    check_platform_distributions:
-      centos: 7
-      fedora: 27
-      rhel: 7
+    vars:
+      check_platform_distributions:
+        centos: 7
+        fedora: 27
+        rhel: 7
 
   - role: amtega.epel
     when: ansible_facts.distribution | lower in ["centos", "rhel"]
@@ -35,29 +36,31 @@ dependencies:
   - role: amtega.tftpd
 
   - role: amtega.xinetd_service
-    xinetd_service_name: rsync
-    xinetd_service_id: rsync
-    xinetd_service_package: rsync
-    xinetd_service_disable: no
-    xinetd_service_socket_type: stream
-    xinetd_service_protocol: tcp
-    xinetd_service_wait: no
-    xinetd_service_user: root
-    xinetd_service_server: /usr/bin/rsync
-    xinetd_service_server_args: "--daemon"
-    xinetd_service_flags: IPv4
+    vars:
+      xinetd_service_name: rsync
+      xinetd_service_id: rsync
+      xinetd_service_package: rsync
+      xinetd_service_disable: no
+      xinetd_service_socket_type: stream
+      xinetd_service_protocol: tcp
+      xinetd_service_wait: no
+      xinetd_service_user: root
+      xinetd_service_server: /usr/bin/rsync
+      xinetd_service_server_args: "--daemon"
+      xinetd_service_flags: IPv4
 
   - role: amtega.packages
-    packages_os:
-      all:
+    vars:
+      packages_os:
         all:
-          cobbler: present
-          cobbler-web: present
-          curl: present
-          debmirror: present
-          hostname: present
-          httpd: present
-          mod_ssl: present
-          pykickstart: present
-          which: present
-          wget: present
+          all:
+            cobbler: present
+            cobbler-web: present
+            curl: present
+            debmirror: present
+            hostname: present
+            httpd: present
+            mod_ssl: present
+            pykickstart: present
+            which: present
+            wget: present

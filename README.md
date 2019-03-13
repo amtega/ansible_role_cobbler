@@ -8,7 +8,9 @@ This is an [Ansible](http://www.ansible.com) role to setup a cobbler server.
 
 ## Role Variables
 
-A list of all the default variables for this role is available in `defaults/main.yml`.
+A list of all the default variables for this role is available in `defaults/main.yml`. The role setups the following facts:
+
+- `cobbler_distros_artifacts`: distros artifacts using the format described by the `amtega.artifact` role.
 
 ## Dependencies
 
