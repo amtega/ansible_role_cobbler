@@ -2,7 +2,7 @@
 #  Setup cobbler settings files
 
 - block:
-    - name: configure /etc/cobbler/settings
+    - name: Configure /etc/cobbler/settings
       template:
         src: settings.j2
         dest: "{{ cobbler_main_config_dir }}/settings"
@@ -12,7 +12,7 @@
         backup: yes
       notify: restart cobblerd
 
-    - name: configure /etc/cobbler/modules.conf
+    - name: Configure /etc/cobbler/modules.conf
       template:
         src: modules.conf.j2
         dest: "{{ cobbler_main_config_dir }}/modules.conf"
@@ -22,7 +22,7 @@
         backup: yes
       notify: restart cobblerd
 
-    - name: configure /etc/debmirror.conf
+    - name: Configure /etc/debmirror.conf
       template:
         src: debmirror.conf.j2
         dest: /etc/debmirror.conf
@@ -32,7 +32,7 @@
         backup: yes
       notify: restart cobblerd
 
-    - name: generate apache ssl certs
+    - name: Generate apache ssl certs
       command: /usr/libexec/httpd-ssl-gencerts
       args:
         creates: /etc/pki/tls/certs/localhost.crt

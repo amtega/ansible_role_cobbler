@@ -2,7 +2,7 @@
 # Add profiles
 
 - block:
-    - name: create profiles kickstart files
+    - name: Create profiles kickstart files
       copy:
         dest: "{{ cobbler_kickstart_files_dir }}/{{ cobbler_kickstart_file }}"
         content: "{{ cobbler_profile.kickstart_content }}"
@@ -13,7 +13,7 @@
         loop_var: cobbler_profile
         label: "{{ cobbler_profile.name }}"
 
-    - name: add profiles
+    - name: Add profiles
       command: >-
         cobbler profile add
         --name={{ cobbler_profile.name }}

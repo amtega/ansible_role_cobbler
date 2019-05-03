@@ -1,13 +1,13 @@
 ---
 # Role tasks
 
-- name: install cobbler
+- name: Install cobbler
   include_tasks: install/main.yml
   tags:
     - role::cobbler
     - role::cobbler::install
 
-- name: configure cobbler
+- name: Configure cobbler
   include_tasks: configure/main.yml
   tags:
     - role::cobbler

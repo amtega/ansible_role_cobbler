@@ -2,24 +2,11 @@
 
 This is an [Ansible](http://www.ansible.com) role to setup a cobbler server.
 
-## Requirements
-
-[Ansible 2.7+](http://docs.ansible.com/ansible/latest/intro_installation.html)
-
 ## Role Variables
 
 A list of all the default variables for this role is available in `defaults/main.yml`. The role setups the following facts:
 
 - `cobbler_distros_artifacts`: distros artifacts using the format described by the `amtega.artifact` role.
-
-## Dependencies
-
-- [amtega.check_platform](https://galaxy.ansible.com/amtega/check_platform)
-- [amtega.epel](https://galaxy.ansible.com/amtega/epel) for CentOS/RHEL systems
-- [amtega.proxy_client](https://galaxy.ansible.com/amtega/proxy_client)
-- [amtega.tftpd](https://galaxy.ansible.com/amtega/tftpd)
-- [amtega.xinetd](https://galaxy.ansible.com/amtega/xinetd)
-- [amtega.packages](https://galaxy.ansible.com/amtega/packages)
 
 ## Example Playbook
 
@@ -27,7 +14,7 @@ This is an example playbook:
 
 ```yaml
 ---
-- name: cobbler sample
+- name: Cobbler sample
   hosts: localhost  
   roles:
     - amtega.cobbler
@@ -46,7 +33,7 @@ $ ansible-playbook main.yml
 
 ## License
 
-Copyright (C) 2018 AMTEGA - Xunta de Galicia
+Copyright (C) 2019 AMTEGA - Xunta de Galicia
 
 This role is free software: you can redistribute it and/or modify it under the terms of:
 

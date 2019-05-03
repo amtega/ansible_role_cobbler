@@ -16,6 +16,7 @@ galaxy_info:
       versions:
         - 27
         - 28
+        - 29
   galaxy_tags:
     - system
     - cobbler
@@ -27,13 +28,24 @@ dependencies:
         centos: 7
         fedora: 27
         rhel: 7
+    tags:
+      - role::cobbler
 
   - role: amtega.epel
     when: ansible_facts.distribution | lower in ["centos", "rhel"]
+    tags:
+      - role::cobbler
+      - role::cobbler::install
 
   - role: amtega.proxy_client
+    tags:
+      - role::cobbler
+      - role::cobbler::install
 
   - role: amtega.tftpd
+    tags:
+      - role::cobbler
+      - role::cobbler::install
 
   - role: amtega.xinetd_service
     vars:
@@ -48,6 +60,9 @@ dependencies:
       xinetd_service_server: /usr/bin/rsync
       xinetd_service_server_args: "--daemon"
       xinetd_service_flags: IPv4
+    tags:
+      - role::cobbler
+      - role::cobbler::install
 
   - role: amtega.packages
     vars:
@@ -64,3 +79,6 @@ dependencies:
             pykickstart: present
             which: present
             wget: present
+    tags:
+      - role::cobbler
+      - role::cobbler::install

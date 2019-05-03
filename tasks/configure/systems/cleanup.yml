@@ -4,7 +4,7 @@
 - block:
     - include_tasks: read.yml
 
-    - name: delete systems to be updated or not found in inventory
+    - name: Delete systems to be updated or not found in inventory
       command: >-
         cobbler system remove \
         --name={{ cobbler_saved_system.name }}

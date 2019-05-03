@@ -2,13 +2,13 @@
 # Read profiles
 
 - block:
-    - name: search profiles config files
+    - name: Search profiles config files
       find:
         paths: "{{ cobbler_config_dir }}/profiles.d"
         file_type: file
       register: cobbler_search_profiles_config_files_result
 
-    - name: read profiles config files
+    - name: Read profiles config files
       command: "cat {{ cobbler_profile_config_file }}"
       register: cobbler_read_profiles_config_result
       changed_when: false
@@ -20,7 +20,7 @@
         loop_var: cobbler_profile_config_file
         label: "{{ (cobbler_profile_config_file | basename | splitext).0 }}"
 
-    - name: read profiles kickstart files
+    - name: Read profiles kickstart files
       command: "cat {{ cobbler_kickstart_file_path }}"
       register: cobbler_read_kickstarts_result
       failed_when: false

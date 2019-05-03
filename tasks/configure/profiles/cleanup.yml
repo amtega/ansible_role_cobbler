@@ -4,7 +4,7 @@
 - block:
     - include_tasks: read.yml
 
-    - name: delete profiles to be updated or not found in inventory
+    - name: Delete profiles to be updated or not found in inventory
       command: >-
         cobbler profile remove \
         --name={{ cobbler_saved_profile.name }}
