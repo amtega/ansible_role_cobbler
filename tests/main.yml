@@ -6,14 +6,16 @@
   roles:
     - role: amtega.docker_presets
       docker_presets_images_json_query: >-
-        [? starts_with(name, `centos-7`)
-           || starts_with(name, `fedora-27`)
-           || starts_with(name, `fedora-28`)
-           || starts_with(name, `fedora-29`) ]
+        [? starts_with(name, `fedora-29`) ]
+
+#        [? starts_with(name, `centos-7`)
+#           || starts_with(name, `fedora-27`)
+#           || starts_with(name, `fedora-28`)
+#           || starts_with(name, `fedora-29`) ]
   tags:
     - sandbox
 
-- name: Start docker testing containers
+- name: Start docker containers
   hosts: localhost
   roles:
     - role: amtega.docker_sandbox
@@ -111,8 +113,8 @@
 #       set_fact:
 #           cobbler_distros: >-
 #             {{ read_distros_config_result.content | b64decode | from_yaml }}
-  tags:
-    - idempotence
+  # tags:
+  #   - idempotence
 #
 # - name: Test cobbler role
 #   hosts: docker_sandbox_containers
@@ -165,7 +167,7 @@
 #     - role: amtega.cobbler
 #   tags:
 #     - idempotence
-
+#
 - name: Cleanup docker sandbox
   hosts: localhost
   roles:
