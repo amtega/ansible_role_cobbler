@@ -1,7 +1,7 @@
 ---
 # Role handlers
 
-- name: cobbler restart daemon
+- name: Restart cobbler daemon
   service:
     name: cobblerd
     state: restarted
@@ -12,7 +12,7 @@
     - role::cobbler::service
     - role::cobbler::service::cobblerd
 
-- name: cobbler synchronize
+- name: Synchronize cobbler
   command: cobbler sync
   listen:
     - synchronize cobbler

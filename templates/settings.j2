@@ -10,15 +10,18 @@ anamon_enabled: {{ cobbler_anamon_enabled | int }}
 authn_pam_service: {{ cobbler_authn_pam_service }}
 auth_token_expiration: {{ cobbler_auth_token_expiration }}
 
-cheetah_import_whitelist: {{ cobbler_cheetah_import_whitelist | to_yaml }}
+cheetah_import_whitelist:
+{{ cobbler_cheetah_import_whitelist | to_nice_yaml | indent(width=2, indentfirst=True) }}
 
 createrepo_flags: {{ cobbler_createrepo_flags }}
 
 default_kickstart: {{ cobbler_default_kickstart }}
 
-default_name_servers: {{ cobbler_default_name_servers | to_yaml }}
+default_name_servers:
+{{ cobbler_default_name_servers | to_nice_yaml | indent(width=2, indentfirst=True) }}
 
-default_ownership: {{ cobbler_default_ownership | to_yaml }}
+default_ownership:
+{{ cobbler_default_ownership | to_nice_yaml | indent(width=2, indentfirst=True) }}
 
 default_password_crypted: {{ cobbler_default_password_crypted }}
 
@@ -30,7 +33,8 @@ enable_menu: {{ cobbler_enable_menu | int }}
 
 http_port: {{ cobbler_http_port }}
 
-kernel_options: {{ cobbler_kernel_options | to_yaml }}
+kernel_options:
+{{ cobbler_kernel_options | to_nice_yaml | indent(width=2, indentfirst=True) }}
 
 manage_dhcp: {{ cobbler_manage_dhcp | int }}
 manage_dns: {{ cobbler_manage_dns | int }}

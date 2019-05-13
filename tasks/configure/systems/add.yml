@@ -2,7 +2,7 @@
 # Add systems
 
 - block:
-    - name: add systems
+    - name: Add systems
       command: >-
         cobbler system add
         --name={{ cobbler_system.name }}

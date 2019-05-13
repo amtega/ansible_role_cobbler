@@ -1,14 +1,14 @@
 ---
 # Configure cobbler tasks
 
-- name: configure cobbler settings
+- name: Configure cobbler settings
   include_tasks: settings.yml
   tags:
     - role::cobbler
     - role::cobbler::configure
     - role::cobbler::configure::settings
 
-- name: configure cobbler service
+- name: Configure cobbler service
   include_tasks: service.yml
   tags:
     - role::cobbler

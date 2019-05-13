@@ -2,18 +2,18 @@
 # Import distros
 
 - block:
-    - name: setup fact with distros ISO artifacts
+    - name: Setup fact with distros ISO artifacts
       set_fact:
         cobbler_distros_artifacts: >-
           {{ lookup("template", "artifacts.yml.j2") | from_yaml }}
 
-    - name: download distros ISO artifacts
+    - name: Download distros ISO artifacts
       include_role:
         name: amtega.artifact
       vars:
         artifact_list: "{{ cobbler_distros_artifacts }}"
 
-    - name: create temporary mount directories for ISO files
+    - name: Create temporary mount directories for ISO files
       file:
         path: "{{ cobbler_iso_mount_dir }}/{{ cobbler_distro.artifact.file }}"
         state: directory
@@ -26,7 +26,7 @@
         loop_var: cobbler_distro
         label: "{{ cobbler_distro.name }}"
 
-    - name: mount ISO files in temporary directories
+    - name: Mount ISO files in temporary directories
       mount:
         fstype: iso9660
         opts: "loop,ro"
@@ -42,7 +42,7 @@
         loop_var: cobbler_distro
         label: "{{ cobbler_distro.name }}"
 
-    - name: update cobbler signatures
+    - name: Update cobbler signatures
       command: cobbler signature update
       register: cobbler_signature_update_result
       failed_when: >-
@@ -57,7 +57,7 @@
 
     - meta: flush_handlers
 
-    - name: import distros
+    - name: Import distros
       command: >-
         cobbler import
         --name={{ cobbler_distro.name }}
@@ -68,7 +68,7 @@
         loop_var: cobbler_distro
         label: "{{ cobbler_distro.name }}"
 
-    - name: add ksmeta attributes to distros config
+    - name: Add ksmeta attributes to distros config
       command: >-
         cobbler distro edit
         --name={{ cobbler_distro.name }}
@@ -81,7 +81,7 @@
         index_var: cobbler_distro_index
         label: "{{ cobbler_distro.name }}"
 
-    - name: umount distros ISO files from temporary directories
+    - name: Umount distros ISO files from temporary directories
       mount:
         fstype: iso9660
         opts: "loop,ro"

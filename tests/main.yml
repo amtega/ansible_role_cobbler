@@ -1,18 +1,19 @@
 ---
 # Tasks for testing role
 
-- name: configure docker sandbox environment
+- name: Configure docker sandbox environment
   hosts: localhost
   roles:
     - role: amtega.docker_presets
       docker_presets_images_json_query: >-
-        [? starts_with(name, `centos-7`)
-           || starts_with(name, `fedora-27`)
-           || starts_with(name, `fedora-28`) ]
+       [? starts_with(name, `centos-7`)
+          || starts_with(name, `fedora-27`)
+          || starts_with(name, `fedora-28`)
+          || starts_with(name, `fedora-29`) ]
   tags:
     - sandbox
 
-- name: run idempotence test
+- name: Start docker containers
   hosts: localhost
   roles:
     - role: amtega.docker_sandbox
@@ -21,15 +22,15 @@
   tags:
     - sandbox
 
-- name: retrieve distos ISO information
+- name: Retrieve distos ISO information
   hosts: localhost
   tasks:
-    - name: setup base urls for CentOS download
+    - name: Setup base urls for CentOS download
       set_fact:
         centos_6_baseurl: http://ftp.cixug.es/CentOS/6/isos/x86_64
         centos_7_baseurl: http://ftp.cixug.es/CentOS/7/isos/x86_64
 
-    - name: setup facts with info to download sha256 files
+    - name: Setup facts with info to download sha256 files
       set_fact:
         sha256sum_files:
           - url: "{{ centos_6_baseurl }}"
@@ -40,7 +41,7 @@
             sha256sum: "sha256sum.txt"
             dest: "{{ playbook_dir }}/CentOS-7-x86_64"
 
-    - name: download sha256 files
+    - name: Download sha256 files
       get_url:
         url: "{{ item.url }}/{{ item.sha256sum }}"
         dest: "{{ item.dest }}"
@@ -50,7 +51,7 @@
       loop_control:
         label: "{{ item.dest }}"
 
-    - name: parse sha256 files
+    - name: Parse sha256 files
       set_fact:
         distro:
           - name: "{{ item.dest | basename }}"
@@ -70,7 +71,7 @@
       loop_control:
         label: "{{ item.dest }}"
 
-    - name: build cobbler_distros fact
+    - name: Build cobbler_distros fact
       set_fact:
         cobbler_distros: >-
           {{ sha256_parse_result.results
@@ -82,14 +83,14 @@
 
 - import_playbook: prepare.yml
 
-- name: run idempotence test
+- name: Run idempotence test
   hosts: localhost
   roles:
     - role: amtega.idempotence_tester
       idempotence_tester_inventory: "{{ docker_sandbox_inventory }}"
       idempotence_tester_group: docker_sandbox_containers
 
-- name: regenerate docker containers
+- name: Regenerate docker containers
   hosts: localhost
   roles:
     - role: amtega.docker_sandbox
@@ -98,22 +99,22 @@
 
 - import_playbook: prepare.yml
 
-- name: setup cobbler distros config
+- name: Setup cobbler distros config
   hosts: docker_sandbox_containers
   tasks:
-    - name: read file with cobbler distros config
+    - name: Read file with cobbler distros config
       slurp:
         src: /tmp/distros.yml
       register: read_distros_config_result
 
-    - name: setup fact with cobbbler distros config
+    - name: Setup fact with cobbbler distros config
       set_fact:
           cobbler_distros: >-
             {{ read_distros_config_result.content | b64decode | from_yaml }}
   tags:
-    - idempotence
+     - idempotence
 
-- name: test cobbler role
+- name: Test cobbler role
   hosts: docker_sandbox_containers
   vars:
     loop_device_pattern:
@@ -165,13 +166,13 @@
   tags:
     - idempotence
 
-- name: cleanup docker sandbox
+- name: Cleanup docker sandbox
   hosts: localhost
   roles:
     - role: amtega.docker_sandbox
       docker_sandbox_state: absent
   tasks:
-    - name: remove sha256 temporary files
+    - name: Remove sha256 temporary files
       file:
         path: "{{ item.dest }}"
         state: absent
