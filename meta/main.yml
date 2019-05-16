@@ -79,6 +79,13 @@ dependencies:
             pykickstart: present
             which: present
             wget: present
+        centos:
+          7:
+            libsemanage-python: present
+        fedora:
+          all:
+            python2-libsemanage: present
+            python3-libsemanage: present
     tags:
       - role::cobbler
       - role::cobbler::install
