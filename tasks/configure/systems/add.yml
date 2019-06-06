@@ -9,7 +9,11 @@
         --profile={{ cobbler_system.profile }}
         --kopts="{{ cobbler_system.kopts | default([]) | join(' ') }}"
       register: cobbler_system_add_result
-      loop: "{{ cobbler_updated_systems.values() | list }}"
+      loop: >-
+        {{ cobbler_updated_systems.values()
+           | selectattr("state", "defined")
+           | selectattr("state", "equalto", "present")
+           | list }}
       loop_control:
         loop_var: cobbler_system
         label: "{{ cobbler_system.name }}"
