@@ -5,11 +5,11 @@
   hosts: localhost
   roles:
     - role: amtega.docker_presets
-      docker_presets_images_json_query: >-
-       [? starts_with(name, `centos-7`)
-          || starts_with(name, `fedora-27`)
-          || starts_with(name, `fedora-28`)
-          || starts_with(name, `fedora-29`) ]
+      vars:
+        docker_presets_images_json_query: >-
+         [? starts_with(name, `centos-7`)
+            || starts_with(name, `fedora-29`)
+            || starts_with(name, `fedora-30`) ]
   tags:
     - sandbox
 
@@ -17,8 +17,9 @@
   hosts: localhost
   roles:
     - role: amtega.docker_sandbox
-      docker_sandbox_state: started
-      docker_sandbox_idempotence_test: no
+      vars:
+        docker_sandbox_state: started
+        docker_sandbox_idempotence_test: no
   tags:
     - sandbox
 
@@ -87,15 +88,17 @@
   hosts: localhost
   roles:
     - role: amtega.idempotence_tester
-      idempotence_tester_inventory: "{{ docker_sandbox_inventory }}"
-      idempotence_tester_group: docker_sandbox_containers
+      vars:
+        idempotence_tester_inventory: "{{ docker_sandbox_inventory }}"
+        idempotence_tester_group: docker_sandbox_containers
 
 - name: Regenerate docker containers
   hosts: localhost
   roles:
     - role: amtega.docker_sandbox
-      docker_sandbox_state: recreated
-      docker_sandbox_idempotence_test: false
+      vars:
+        docker_sandbox_state: recreated
+        docker_sandbox_idempotence_test: false
 
 - import_playbook: prepare.yml
 
@@ -170,7 +173,8 @@
   hosts: localhost
   roles:
     - role: amtega.docker_sandbox
-      docker_sandbox_state: absent
+      vars:
+        docker_sandbox_state: absent
   tasks:
     - name: Remove sha256 temporary files
       file:

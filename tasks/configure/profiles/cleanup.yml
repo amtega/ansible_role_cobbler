@@ -11,7 +11,7 @@
         --recursive
       when:
         cobbler_saved_profile.name in cobbler_absent_profiles_names
-        or (cobbler_delete_unmanaged
+        or (cobbler_delete_unmanaged | bool
             and cobbler_saved_profile.name
                 not in cobbler_present_profiles_names)
         or cobbler_saved_profile.name in cobbler_updated_profiles.keys() | list

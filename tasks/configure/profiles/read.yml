@@ -11,7 +11,7 @@
     - name: Read profiles config files
       command: "cat {{ cobbler_profile_config_file }}"
       register: cobbler_read_profiles_config_result
-      changed_when: false
+      changed_when: no
       loop: >-
         {{ cobbler_search_profiles_config_files_result.files
            | map(attribute="path")
@@ -23,8 +23,8 @@
     - name: Read profiles kickstart files
       command: "cat {{ cobbler_kickstart_file_path }}"
       register: cobbler_read_kickstarts_result
-      failed_when: false
-      changed_when: false
+      failed_when: no
+      changed_when: no
       loop: >-
         {{ cobbler_profiles
            | selectattr('state', 'equalto', 'present')

@@ -46,7 +46,7 @@
         --recursive
       when:
         cobbler_saved_distro.name in cobbler_absent_distros_names
-        or (cobbler_delete_unmanaged
+        or (cobbler_delete_unmanaged | bool
             and cobbler_saved_distro.name not in cobbler_present_distros_names)
         or cobbler_saved_distro.name in cobbler_updated_distros.keys() | list
       register: cobbler_delete_distros_result
