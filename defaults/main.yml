@@ -210,4 +210,4 @@ cobbler_systems: []
 # delete all distros, profiles and ISOs that are not part of the role config in
 # the inventory.
 
-cobbler_delete_unmanaged: true
+cobbler_delete_unmanaged: yes
