@@ -7,7 +7,7 @@ galaxy_info:
   description: Setup a cobbler server
   company: AMTEGA - Xunta de Galicia
   license: GPLv3 or EUPL
-  min_ansible_version: 2.7
+  min_ansible_version: 2.8
   platforms:
     - name: EL
       versions:
@@ -22,69 +22,25 @@ galaxy_info:
 
 dependencies:
   - role: amtega.check_platform
-    vars:
-      check_platform_distributions:
-        centos: 7
-        fedora: 29
-        rhel: 7
     tags:
-      - role::cobbler
+      - never
 
   - role: amtega.epel
-    when: ansible_facts.distribution | lower in ["centos", "rhel"]
     tags:
-      - role::cobbler
-      - role::cobbler::install
+      - never
 
   - role: amtega.proxy_client
     tags:
-      - role::cobbler
-      - role::cobbler::install
+      - never
 
   - role: amtega.tftpd
     tags:
-      - role::cobbler
-      - role::cobbler::install
+      - never
 
   - role: amtega.xinetd_service
-    vars:
-      xinetd_service_name: rsync
-      xinetd_service_id: rsync
-      xinetd_service_package: rsync
-      xinetd_service_disable: no
-      xinetd_service_socket_type: stream
-      xinetd_service_protocol: tcp
-      xinetd_service_wait: no
-      xinetd_service_user: root
-      xinetd_service_server: /usr/bin/rsync
-      xinetd_service_server_args: "--daemon"
-      xinetd_service_flags: IPv4
     tags:
-      - role::cobbler
-      - role::cobbler::install
+      - never
 
   - role: amtega.packages
-    vars:
-      packages_os:
-        all:
-          all:
-            cobbler: present
-            cobbler-web: present
-            curl: present
-            debmirror: present
-            hostname: present
-            httpd: present
-            mod_ssl: present
-            pykickstart: present
-            which: present
-            wget: present
-        centos:
-          7:
-            libsemanage-python: present
-        fedora:
-          all:
-            python2-libsemanage: present
-            python3-libsemanage: present
     tags:
-      - role::cobbler
-      - role::cobbler::install
+      - never
