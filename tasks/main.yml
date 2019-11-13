@@ -7,7 +7,7 @@
     check_platform_distributions:
       centos: 7
       fedora: 29
-      rhel: 7
+      redhat: 7
 
 - include_role:
     name: amtega.epel
