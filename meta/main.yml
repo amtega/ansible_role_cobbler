@@ -22,25 +22,55 @@ galaxy_info:
 
 dependencies:
   - role: amtega.check_platform
-    tags:
-      - never
+    vars:
+      check_platform_distributions:
+        centos: 7
+        fedora: 29
+        redhat: 7
 
   - role: amtega.epel
-    tags:
-      - never
 
   - role: amtega.proxy_client
-    tags:
-      - never
 
   - role: amtega.tftpd
-    tags:
-      - never
 
   - role: amtega.xinetd_service
-    tags:
-      - never
+    vars:
+      xinetd_service_name: rsync
+      xinetd_service_id: rsync
+      xinetd_service_package: rsync
+      xinetd_service_disable: no
+      xinetd_service_socket_type: stream
+      xinetd_service_protocol: tcp
+      xinetd_service_wait: no
+      xinetd_service_user: root
+      xinetd_service_server: /usr/bin/rsync
+      xinetd_service_server_args: "--daemon"
+      xinetd_service_flags: IPv4
 
   - role: amtega.packages
+    vars:
+      packages_os:
+        all:
+          all:
+            cobbler: present
+            cobbler-web: present
+            curl: present
+            debmirror: present
+            hostname: present
+            httpd: present
+            mod_ssl: present
+            pykickstart: present
+            which: present
+            wget: present
+        centos:
+          7:
+            libsemanage-python: present
+        fedora:
+          all:
+            python2-libsemanage: present
+            python3-libsemanage: present
+
+  - role: amtega.artifact
     tags:
       - never
