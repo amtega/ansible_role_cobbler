@@ -1,6 +1,12 @@
 ---
 # Role tasks
 
+- name: Setup fact to optimize further runs
+  set_fact:
+    cobbler_deps_resolved: yes
+  tags:
+    - role::cobbler
+
 - name: Install cobbler
   include_tasks: install/main.yml
   tags:
