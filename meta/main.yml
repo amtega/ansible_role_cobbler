@@ -27,12 +27,16 @@ dependencies:
         centos: 7
         fedora: 29
         redhat: 7
+    when: not cobbler_deps_resolved | default(false)
 
   - role: amtega.epel
+    when: not cobbler_deps_resolved | default(false)
 
   - role: amtega.proxy_client
+    when: not cobbler_deps_resolved | default(false)
 
   - role: amtega.tftpd
+    when: not cobbler_deps_resolved | default(false)
 
   - role: amtega.xinetd_service
     vars:
@@ -47,6 +51,7 @@ dependencies:
       xinetd_service_server: /usr/bin/rsync
       xinetd_service_server_args: "--daemon"
       xinetd_service_flags: IPv4
+    when: not cobbler_deps_resolved | default(false)
 
   - role: amtega.packages
     vars:
@@ -70,6 +75,7 @@ dependencies:
           all:
             python2-libsemanage: present
             python3-libsemanage: present
+    when: not cobbler_deps_resolved | default(false)
 
   - role: amtega.artifact
     tags:
