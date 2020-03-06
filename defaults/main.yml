@@ -211,3 +211,7 @@ cobbler_systems: []
 # the inventory.
 
 cobbler_delete_unmanaged: yes
+
+# Hide sensitive information
+
+cobbler_no_log: yes
