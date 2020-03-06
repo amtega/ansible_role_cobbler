@@ -27,55 +27,22 @@ dependencies:
         centos: 7
         fedora: 29
         redhat: 7
-    when: not cobbler_deps_resolved | default(false)
 
   - role: amtega.epel
-    when: not cobbler_deps_resolved | default(false)
+    tags:
+      - never
 
   - role: amtega.proxy_client
-    when: not cobbler_deps_resolved | default(false)
+    tags:
+      - never
 
   - role: amtega.tftpd
-    when: not cobbler_deps_resolved | default(false)
-
-  - role: amtega.xinetd_service
-    vars:
-      xinetd_service_name: rsync
-      xinetd_service_id: rsync
-      xinetd_service_package: rsync
-      xinetd_service_disable: no
-      xinetd_service_socket_type: stream
-      xinetd_service_protocol: tcp
-      xinetd_service_wait: no
-      xinetd_service_user: root
-      xinetd_service_server: /usr/bin/rsync
-      xinetd_service_server_args: "--daemon"
-      xinetd_service_flags: IPv4
-    when: not cobbler_deps_resolved | default(false)
+    tags:
+      - never
 
   - role: amtega.packages
-    vars:
-      packages_os:
-        all:
-          all:
-            cobbler: present
-            cobbler-web: present
-            curl: present
-            debmirror: present
-            hostname: present
-            httpd: present
-            mod_ssl: present
-            pykickstart: present
-            which: present
-            wget: present
-        centos:
-          7:
-            libsemanage-python: present
-        fedora:
-          all:
-            python2-libsemanage: present
-            python3-libsemanage: present
-    when: not cobbler_deps_resolved | default(false)
+    tags:
+      - never
 
   - role: amtega.artifact
     tags:

@@ -1,0 +1,63 @@
+---
+# Configure cobbler deps
+
+- block:
+    - include_role:
+        name: amtega.epel
+
+    - include_role:
+        name: amtega.proxy_client
+
+    - include_role:
+        name: amtega.tftpd
+
+    - include_role:
+        name: amtega.xinetd_service
+      vars:
+        xinetd_service_name: rsync
+        xinetd_service_id: rsync
+        xinetd_service_package: rsync
+        xinetd_service_disable: no
+        xinetd_service_socket_type: stream
+        xinetd_service_protocol: tcp
+        xinetd_service_wait: no
+        xinetd_service_user: root
+        xinetd_service_server: /usr/bin/rsync
+        xinetd_service_server_args: "--daemon"
+        xinetd_service_flags: IPv4
+
+    - include_role:
+        name: amtega.packages
+      vars:
+        packages_os:
+          all:
+            all:
+              cobbler: present
+              cobbler-web: present
+              curl: present
+              debmirror: present
+              hostname: present
+              httpd: present
+              mod_ssl: present
+              pykickstart: present
+              which: present
+              wget: present
+          centos:
+            7:
+              libsemanage-python: present
+          fedora:
+            all:
+              python2-libsemanage: present
+              python3-libsemanage: present
+
+    - name: Setup fact to optimize further runs
+      set_fact:
+        cobbler_deps_resolved: yes
+      tags:
+        - role::cobbler
+    - fail:
+  when: not cobbler_deps_resolved | default(false)
+  tags:
+    - role::cobbler
+    - role::cobbler::configure
+    - role::cobbler::configure::deps
