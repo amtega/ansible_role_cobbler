@@ -55,7 +55,7 @@
         cobbler_deps_resolved: yes
       tags:
         - role::cobbler
-    - fail:
+
   when: not cobbler_deps_resolved | default(false)
   tags:
     - role::cobbler
