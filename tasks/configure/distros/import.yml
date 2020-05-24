@@ -85,14 +85,16 @@
       mount:
         fstype: iso9660
         opts: "loop,ro"
-        src: "{{ cobbler_iso_file }}"
-        name: "{{ cobbler_iso_mount_dir }}/{{ cobbler_iso_file | basename }}"
-        state: unmounted
+        path: "{{ cobbler_iso_mount_dir }}/{{ cobbler_iso_file | basename }}"
+        state: absent
       register: cobbler_umount_isos_result
       loop: >-
         {{ cobbler_search_iso_files_result.files
            | map(attribute="path")
-           | list }}
+           | list
+           + cobbler_distros
+             | map(attribute="artifact.file")
+             | list }}
       loop_control:
         loop_var: cobbler_iso_file
 
