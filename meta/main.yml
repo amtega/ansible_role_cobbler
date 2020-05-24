@@ -29,20 +29,33 @@ dependencies:
         redhat: 7
 
   - role: amtega.epel
-    tags:
-      - never
 
   - role: amtega.proxy_client
-    tags:
-      - never
 
   - role: amtega.tftpd
-    tags:
-      - never
 
   - role: amtega.packages
-    tags:
-      - never
+    vars:
+      packages_os:
+        all:
+          all:
+            cobbler: present
+            cobbler-web: present
+            curl: present
+            debmirror: present
+            hostname: present
+            httpd: present
+            mod_ssl: present
+            pykickstart: present
+            which: present
+            wget: present
+        centos:
+          7:
+            libsemanage-python: present
+        fedora:
+          all:
+            python2-libsemanage: present
+            python3-libsemanage: present
 
   - role: amtega.artifact
     tags:
