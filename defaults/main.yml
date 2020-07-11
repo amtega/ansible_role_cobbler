@@ -212,6 +212,12 @@ cobbler_systems: []
 
 cobbler_delete_unmanaged: yes
 
+# Tells the role to run only the systems configuration related tasks, assuming
+# that the server was previously configured in other role run. This is useful
+# when you want to reduce role processing time when adding systems only
+
+cobbler_systems_only: no
+
 # Hide sensitive information
 
 cobbler_no_log: yes

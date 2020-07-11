@@ -43,7 +43,7 @@
 
     - name: Setup syslinux boot files into tftp
       copy:
-        src: "/var/lib/cobbler/loaders/{{ cobbler_loader_item }}"
+        src: "/usr/share/syslinux/{{ cobbler_loader_item }}"
         dest: "{{ tftpd_root_directory | default('/var/lib/tftpboot') }}"
         remote_src: yes
       loop:

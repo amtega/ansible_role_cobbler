@@ -3,12 +3,14 @@
 
 - name: Configure cobbler
   include_tasks: cobbler/main.yml
+  when: not cobbler_systems_only | bool
   tags:
     - role::cobbler
     - role::cobbler::configure
     - role::cobbler::configure::service
 
 - name: Configure cobbler distros
+  when: not cobbler_systems_only | bool
   include_tasks: distros/main.yml
   tags:
     - role::cobbler
@@ -17,6 +19,7 @@
     - role::cobbler::configure::distros::cleanup
 
 - name: Configure cobbler profiles
+  when: not cobbler_systems_only | bool
   include_tasks: profiles/main.yml
   tags:
     - role::cobbler
