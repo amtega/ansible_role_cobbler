@@ -3,6 +3,7 @@
 
 - name: Install cobbler
   include_tasks: install/main.yml
+  when: not cobbler_systems_only | bool
   tags:
     - role::cobbler
     - role::cobbler::install
