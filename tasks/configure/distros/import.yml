@@ -47,11 +47,13 @@
       register: cobbler_signature_update_result
       failed_when: >-
         '*** TASK COMPLETE ***' not in cobbler_signature_update_result.stdout
-      when: >-
-        artifact_result.values()
-        | select("changed")
-        | list
-        | length > 0
+      when:
+        - artifact_result is defined
+        - >-
+          artifact_result.values()
+          | select("changed")
+          | list
+          | length > 0
       notify:
         - restart cobblerd
 
@@ -100,15 +102,17 @@
 
     - include_tasks: cleanup.yml
       when:
-        (artifact_result.values() | list
-         + cobbler_create_mount_dirs_result.results
-         + cobbler_mount_isos_result.results
-         + cobbler_import_result.results
-         + cobbler_add_ksmeta_result.results
-         + cobbler_umount_isos_result.results)
-        | select('changed')
-        | list
-        | length > 0
+        - artifact_result is defined
+        - >-
+          (artifact_result.values() | list
+           + cobbler_create_mount_dirs_result.results
+           + cobbler_mount_isos_result.results
+           + cobbler_import_result.results
+           + cobbler_add_ksmeta_result.results
+           + cobbler_umount_isos_result.results)
+          | select('changed')
+          | list
+          | length > 0
   tags:
     - role::cobbler
     - role::cobbler::configure
