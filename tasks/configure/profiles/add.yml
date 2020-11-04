@@ -6,6 +6,7 @@
       copy:
         dest: "{{ cobbler_kickstart_files_dir }}/{{ cobbler_kickstart_file }}"
         content: "{{ cobbler_profile.kickstart_content }}"
+        mode: 0755
       register: cobbler_kickstart_add_result
       when: cobbler_profile.kickstart_content is defined
       loop: "{{ cobbler_updated_profiles.values() | list }}"
