@@ -3,3 +3,6 @@
 *.tmp
 *.pyc
 tests/CentOS*
+
+.cache
+
