@@ -13,8 +13,8 @@ cobbler_tmp_dir: /var/lib/cobbler/tmp
 
 cobbler_iso_dir: "{{ cobbler_tmp_dir }}/iso"
 
-# Cobbler own settings. These settings have the same meaning that the ones
-# detailed in the cobbler documentation, but here they are prefixed by
+# Cobbler own settings. Most of these settings have the same meaning that the
+# ones detailed in the cobbler documentation, but here they are prefixed by
 # "cobbler_"
 
 cobbler_allow_duplicate_hostnames: no
@@ -85,6 +85,16 @@ cobbler_run_install_triggers: yes
 
 cobbler_server: "{{ ansible_facts.default_ipv4.address }}"
 
+# Dicts with the cobbler signatures to manage. The dict has the same format that
+# the cobbler json signature file. If defined the signatures will not be updated
+# using the variables cobbler_update_signatures and cobbler_signatures_url
+# detailed below
+#
+# cobbler_signatures:
+
+cobbler_update_signatures: yes
+cobbler_signatures_url: http://cobbler.github.io/signatures/latest.json
+
 cobbler_client_use_localhost: no
 cobbler_client_use_https: no
 
@@ -109,6 +119,7 @@ cobbler_always_write_dhcp_entries: no
 
 cobbler_proxy_url_ext: >-
   {{ proxy_client_http_proxy | default(proxy_client_https_proxy) }}
+
 cobbler_proxy_url_int: ""
 
 # List of dicts with the cobbler distros to manage. The format of the list items

@@ -65,6 +65,8 @@ run_install_triggers: {{ cobbler_run_install_triggers | int }}
 
 server: {{ cobbler_server }}
 
+signature_url: {{ cobbler_signatures_url }}
+
 client_use_localhost: {{ cobbler_client_use_localhost | int }}
 client_use_https: {{ cobbler_client_use_https | int }}
 
