@@ -1,0 +1,31 @@
+---
+
+- name: Converge
+  hosts: molecule_hosts
+  gather_facts: no
+  tasks:
+    - name: Read file with cobbler distros config
+      slurp:
+        src: /tmp/distros.yml
+      register: read_distros_config_result
+
+    - name: Setup fact with cobbbler distros config
+      set_fact:
+        cobbler_distros: >-
+          {{ read_distros_config_result.content | b64decode | from_yaml }}
+
+    # Docker containers share loop devices with the host, so prior to applly the
+    # cobbler role we need to provisione enough loop devices to allow the role
+    # be able to mount ISO files
+
+    - include_role:
+        name: amtega.dev
+      vars:
+        dev_special_files: >-
+          {{ loop_device_pattern
+              | dev_expand(
+                n=0 | dev_to(5 + groups.molecule_hosts
+                                 | length * (cobbler_distros | length))) }}
+
+    - include_role:
+        name: amtega.cobbler

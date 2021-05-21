@@ -24,10 +24,17 @@
         state: started
         enabled: yes
 
-    - name: Download cobbler loaders
-      command: cobbler get-loaders
-      register: cobbler_rsync_result
-      changed_when: cobbler_rsync_result.stdout is search("downloading")
+    - synchronize:
+        src: /usr/share/syslinux/
+        dest: /var/lib/cobbler/loaders
+        archive: yes
+        delete: yes
+      delegate_to: "{{ inventory_hostname }}"
+
+    # - name: Download cobbler loaders
+    #   command: cobbler get-loaders
+    #   register: cobbler_rsync_result
+    #   changed_when: cobbler_rsync_result.stdout is search("downloading")
 
     - meta: flush_handlers
   tags:

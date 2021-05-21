@@ -1,0 +1,115 @@
+---
+
+dependency:
+  name: galaxy
+  enabled: yes
+  options:
+    ignore-certs: yes
+    ignore-errors: yes
+    role-file: "${MOLECULE_SCENARIO_DIRECTORY}/requirements.yml"
+    requirements-file: "${MOLECULE_SCENARIO_DIRECTORY}/requirements.yml"
+driver:
+  name: docker
+lint: "${MOLECULE_SCENARIO_DIRECTORY}/linters.sh"
+platforms:
+  - name: "centos7-${INSTANCE_UUID:-1}"
+    image: centos:7
+    dockerfile: Dockerfile.systemd.j2
+    command: /sbin/init
+    tmpfs:
+      - /run
+      - /tmp
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+    groups:
+      - molecule_hosts
+      - molecule_hosts_centos
+      - molecule_hosts_centos_7
+  - name: "centos8-${INSTANCE_UUID:-1}"
+    image: centos:8
+    dockerfile: Dockerfile.systemd.j2
+    command: /sbin/init
+    tmpfs:
+      - /run
+      - /tmp
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+    groups:
+      - molecule_hosts
+      - molecule_hosts_centos
+      - molecule_hosts_centos_8
+  - name: "fedora33-${INSTANCE_UUID:-1}"
+    image: fedora:33
+    dockerfile: Dockerfile.systemd.j2
+    command: /sbin/init
+    tmpfs:
+      - /run
+      - /tmp
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+    groups:
+      - molecule_hosts
+      - molecule_hosts_fedora
+      - molecule_hosts_fedora_33
+  - name: "fedora34-${INSTANCE_UUID:-1}"
+    image: fedora:34
+    dockerfile: Dockerfile.systemd.j2
+    command: /sbin/init
+    tmpfs:
+      - /run
+      - /tmp
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+    groups:
+      - molecule_hosts
+      - molecule_hosts_fedora
+      - molecule_hosts_fedora_34
+provisioner:
+  name: ansible
+  config_options:
+    defaults:
+      callback_whitelist: profile_tasks
+      action_plugins: $PWD/action_plugins
+  inventory:
+    hosts:
+      molecule_hosts:
+        vars:
+          loop_device_pattern:
+            state: present
+            path: "/dev/loop{n}"
+            type: block
+            major: 7
+            minor: "{n}"
+            mode: "0660"
+
+          cobbler_server: >-
+            {{ hostvars[inventory_hostname]['ansible_eth0']['ipv4']['address'] }}
+
+          cobbler_next_server: >-
+            {{ hostvars[inventory_hostname]['ansible_eth0']['ipv4']['address'] }}
+
+          cobbler_profiles:
+            - name: CentOS-7-x86_64
+              distro: CentOS-7-x86_64
+              kickstart_content: "%end"
+              state: present
+
+            - name: CentOS-8-x86_64
+              distro: CentOS-8-x86_64
+              kickstart: /var/lib/cobbler/kickstarts/default.ks
+              state: present
+
+          cobbler_systems:
+            - name: 192.168.5.6
+              profile: CentOS-7-x86_64
+              state: present
+
+            - name: 192.168.5.7
+              profile: CentOS-8-x86_64
+              state: present
+
+      molecule_hosts_fedora:
+        vars:
+          ansible_python_interpreter: /usr/bin/python3
+verifier:
+  name: ansible

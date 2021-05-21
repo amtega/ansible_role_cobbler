@@ -1,0 +1,73 @@
+---
+
+- name: Prepare
+  hosts: molecule_hosts
+  gather_facts: no
+  tasks:
+    - name: Setup base urls for CentOS download
+      set_fact:
+        centos_7_baseurl: https://ftp.rediris.es/mirror/CentOS/7/isos/x86_64
+        centos_8_baseurl: https://ftp.rediris.es/mirror/CentOS/8/isos/x86_64
+
+    - name: Setup facts with info to download checksum files
+      set_fact:
+        checksum_files:
+          - url: "{{ centos_7_baseurl }}"
+            file: sha256sum.txt
+            dest: /tmp/CentOS-7-x86_64
+
+          - url: "{{ centos_8_baseurl }}"
+            file: CHECKSUM.asc
+            dest: /tmp/CentOS-8-x86_64
+
+    - name: Download checksum files
+      get_url:
+        url: "{{ item.url }}/{{ item.file }}"
+        dest: "{{ item.dest }}"
+        force: yes
+        timeout: 60
+      loop: "{{ checksum_files }}"
+      loop_control:
+        label: "{{ item.dest }}"
+
+    - name: Read checksum files
+      command: "cat {{ item.dest }}"
+      register: read_checksum_files_result
+      changed_when: no
+      loop: "{{ checksum_files }}"
+      loop_control:
+        label: "{{ item.dest }}"
+
+    - name: Parse checksum files
+      set_fact:
+        distro:
+          - name: "{{ item.dest | basename }}"
+            artifact:
+              type: http
+              host: "http://{{ item.url | urlsplit('hostname') }}"
+              path: "{{ item.url | urlsplit('path') }}"
+              file: >-
+                {{ (read_checksum_files_result.results[index].stdout_lines
+                    | map("regex_replace", " +", " ")
+                    | map("regex_replace", ":", "")
+                    | map("regex_replace", "\(", "")
+                    | map("regex_replace", "\)", "")
+                    | select("search", "[Mm]inimal")
+                    | list
+                    | first).split(" ").1 }}
+            state: present
+      register: checksum_parse_result
+      loop: "{{ checksum_files }}"
+      loop_control:
+        index_var: index
+        label: "{{ item.dest }}"
+
+    - name: Create file with cobbler distros config
+      copy:
+        content: >-
+          {{ checksum_parse_result.results
+              | map(attribute="ansible_facts")
+              | sum("distro", [])
+              | list
+              | to_nice_yaml }}
+        dest: /tmp/distros.yml

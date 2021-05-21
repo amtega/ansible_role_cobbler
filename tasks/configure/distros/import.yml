@@ -98,7 +98,7 @@
       loop_control:
         loop_var: cobbler_iso_file
 
-    - include_tasks: cleanup.yml
+    - include_tasks: clean.yml
       when:
         - artifact_result is defined
         - >-

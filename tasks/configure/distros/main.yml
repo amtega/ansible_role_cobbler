@@ -2,7 +2,7 @@
 # Configure distros tasks
 
 - block:
-    - include_tasks: cleanup.yml
+    - include_tasks: clean.yml
     - include_tasks: import.yml
   vars:
     cobbler_saved_distros: >-
