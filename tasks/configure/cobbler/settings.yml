@@ -10,7 +10,9 @@
         group: root
         mode: 0644
         backup: yes
-      notify: restart cobblerd
+      notify:
+        - update signature
+        - restart cobblerd
 
     - name: Configure /etc/cobbler/modules.conf
       template:
@@ -21,6 +23,15 @@
         mode: 0644
         backup: yes
       notify: restart cobblerd
+
+    - name: Setup signatures
+      copy:
+        dest: "{{ cobbler_signatures_path }}"
+        content: "{{ cobbler_signatures | to_nice_json }}"
+        mode: 0644
+      when: cobbler_signatures is defined
+      notify:
+        - restart cobblerd
 
     - name: Configure /etc/debmirror.conf
       template:

@@ -13,8 +13,8 @@ cobbler_tmp_dir: /var/lib/cobbler/tmp
 
 cobbler_iso_dir: "{{ cobbler_tmp_dir }}/iso"
 
-# Cobbler own settings. These settings have the same meaning that the ones
-# detailed in the cobbler documentation, but here they are prefixed by
+# Cobbler own settings. Most of these settings have the same meaning that the
+# ones detailed in the cobbler documentation, but here they are prefixed by
 # "cobbler_"
 
 cobbler_allow_duplicate_hostnames: no
@@ -28,9 +28,9 @@ cobbler_authn_pam_service: login
 cobbler_auth_token_expiration: 3600
 
 cobbler_cheetah_import_whitelist:
- - random
- - re
- - time
+  - random
+  - re
+  - time
 
 cobbler_createrepo_flags: -c cache -s sha
 
@@ -39,7 +39,7 @@ cobbler_default_kickstart: /var/lib/cobbler/kickstarts/default.ks
 cobbler_default_name_servers: []
 
 cobbler_default_ownership:
- - admin
+  - admin
 
 cobbler_default_password_crypted: $1$hZtCu.xn$OcfOoLF7907a.3rd73PqK1
 
@@ -52,9 +52,9 @@ cobbler_enable_menu: yes
 cobbler_http_port: 80
 
 cobbler_kernel_options:
- ksdevice: bootif
- lang: ' '
- text: ~
+  ksdevice: bootif
+  lang: ' '
+  text: ~
 
 cobbler_manage_dhcp: no
 cobbler_manage_dns: no
@@ -69,7 +69,7 @@ cobbler_pxe_template_dir: /etc/cobbler/pxe
 
 cobbler_consoles: /var/consoles
 
-cobbler_redhat_management_type: off
+cobbler_redhat_management_type: "off"
 cobbler_redhat_management_server: xmlrpc.rhn.redhat.com
 cobbler_redhat_management_key: ""
 cobbler_redhat_management_permissive: no
@@ -84,6 +84,21 @@ cobbler_restart_dhcp: yes
 cobbler_run_install_triggers: yes
 
 cobbler_server: "{{ ansible_facts.default_ipv4.address }}"
+
+# Indicate if loaders must be downloaded unsing get-loaders command. If set to
+# no loaders will be taken directly from the syslinux package
+
+cobbler_get_loaders: no
+
+# Dicts with the cobbler signatures to manage. The dict has the same format that
+# the cobbler json signature file. If defined the signatures will not be updated
+# using the variables cobbler_update_signatures and cobbler_signatures_url
+# detailed below
+#
+# cobbler_signatures:
+
+cobbler_update_signatures: yes
+#cobbler_signatures_url:
 
 cobbler_client_use_localhost: no
 cobbler_client_use_https: no
@@ -109,6 +124,7 @@ cobbler_always_write_dhcp_entries: no
 
 cobbler_proxy_url_ext: >-
   {{ proxy_client_http_proxy | default(proxy_client_https_proxy) }}
+
 cobbler_proxy_url_int: ""
 
 # List of dicts with the cobbler distros to manage. The format of the list items

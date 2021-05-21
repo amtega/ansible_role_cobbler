@@ -2,7 +2,7 @@
 # Configure profiles tasks
 
 - block:
-    - include_tasks: cleanup.yml
+    - include_tasks: clean.yml
     - include_tasks: add.yml
   vars:
     cobbler_saved_profiles: >-

@@ -3,19 +3,17 @@
 
 galaxy_info:
   role_name: cobbler
+  namespace: amtega
   author: Juan Antonio Valiño García
   description: Setup a cobbler server
   company: AMTEGA - Xunta de Galicia
   license: GPLv3 or EUPL
-  min_ansible_version: 2.9
+  min_ansible_version: 2.10
   platforms:
     - name: EL
       versions:
         - 7
-    - name: Fedora
-      versions:
-        - 29
-        - 30
+        - 8
   galaxy_tags:
     - system
     - cobbler
@@ -25,7 +23,6 @@ dependencies:
     vars:
       check_platform_distributions:
         centos: 7
-        fedora: 29
         redhat: 7
 
   - role: amtega.epel
@@ -47,15 +44,17 @@ dependencies:
             httpd: present
             mod_ssl: present
             pykickstart: present
+            syslinux: present
             which: present
             wget: present
         centos:
           7:
             libsemanage-python: present
+          8:
+            python-libsemanage: present
         fedora:
           all:
-            python2-libsemanage: present
-            python3-libsemanage: present
+            python-libsemanage: present
 
   - role: amtega.artifact
     tags:

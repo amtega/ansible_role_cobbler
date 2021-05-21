@@ -2,7 +2,8 @@
 # Install tasks
 
 - block:
-    - include_role:
+    - name: Setup rsync xinetd service
+      include_role:
         name: amtega.xinetd_service
       vars:
         xinetd_service_name: rsync

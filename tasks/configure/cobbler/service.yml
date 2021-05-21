@@ -24,12 +24,23 @@
         state: started
         enabled: yes
 
+    - name: Setup cobbler loaders from syslinux package
+      synchronize:
+        src: "{{ cobbler_loaders_syslinux_dir }}/"
+        dest: "{{ cobbler_loaders_dir }}"
+        archive: yes
+        delete: yes
+      when: not cobbler_get_loaders | bool
+      delegate_to: "{{ inventory_hostname }}"
+
     - name: Download cobbler loaders
       command: cobbler get-loaders
       register: cobbler_rsync_result
+      when: cobbler_get_loaders | bool
       changed_when: cobbler_rsync_result.stdout is search("downloading")
 
-    - meta: flush_handlers
+    - name: Flush handlers
+      meta: flush_handlers
   tags:
     - role::cobbler
     - role::cobbler::configure
