@@ -3,6 +3,7 @@
 - name: Prepare
   hosts: molecule_hosts
   gather_facts: no
+  become: yes
   tasks:
     - name: Setup base urls for CentOS download
       set_fact:
@@ -71,3 +72,4 @@
               | list
               | to_nice_yaml }}
         dest: /tmp/distros.yml
+        mode: 0644

@@ -28,6 +28,7 @@
       copy:
         dest: "{{ cobbler_signatures_path }}"
         content: "{{ cobbler_signatures | to_nice_json }}"
+        mode: 0644
       when: cobbler_signatures is defined
       notify:
         - restart cobblerd

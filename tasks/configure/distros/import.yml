@@ -55,7 +55,8 @@
       notify:
         - update signature
 
-    - meta: flush_handlers
+    - name: Flush handlers
+      meta: flush_handlers
 
     - name: Import distros
       command: >-
