@@ -42,12 +42,10 @@
         loop_var: cobbler_distro
         label: "{{ cobbler_distro.name }}"
 
-    - name: Update cobbler signatures
-      command: cobbler signature update
-      register: cobbler_signature_update_result
-      failed_when: >-
-        '*** TASK COMPLETE ***' not in cobbler_signature_update_result.stdout
+    - name: Trigger cobbler signature update
+      command: /bin/true
       when:
+        - cobbler_signatures is undefined
         - artifact_result is defined
         - >-
           artifact_result.values()
@@ -55,9 +53,10 @@
           | list
           | length > 0
       notify:
-        - restart cobblerd
+        - update signature
 
-    - meta: flush_handlers
+    - name: Flush handlers
+      meta: flush_handlers
 
     - name: Import distros
       command: >-
@@ -100,7 +99,7 @@
       loop_control:
         loop_var: cobbler_iso_file
 
-    - include_tasks: cleanup.yml
+    - include_tasks: clean.yml
       when:
         - artifact_result is defined
         - >-

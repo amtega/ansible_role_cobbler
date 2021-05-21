@@ -1,0 +1,20 @@
+---
+
+- name: Converge
+  hosts: molecule_hosts
+  gather_facts: no
+  become: yes
+  tasks:
+    - name: Read file with cobbler distros config
+      slurp:
+        src: /tmp/distros.yml
+      register: read_distros_config_result
+
+    - name: Setup fact with cobbbler distros config
+      set_fact:
+        cobbler_distros: >-
+          {{ read_distros_config_result.content | b64decode | from_yaml }}
+
+    - name: Setup cobbler
+      include_role:
+        name: amtega.cobbler

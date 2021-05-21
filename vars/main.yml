@@ -9,6 +9,15 @@ cobbler_main_config_dir: /etc/cobbler
 
 cobbler_iso_mount_dir: "{{ cobbler_iso_dir }}/mounted"
 
+# Loaders dir
+
+cobbler_loaders_dir: /var/lib/cobbler/loaders
+cobbler_loaders_syslinux_dir: /usr/share/syslinux
+
+# Signatures file path
+
+cobbler_signatures_path: /var/lib/cobbler/distro_signatures.json
+
 # Directory for kickstart files
 
 cobbler_kickstart_files_dir: /var/lib/cobbler/kickstarts

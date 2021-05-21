@@ -12,6 +12,19 @@
     - role::cobbler::service
     - role::cobbler::service::cobblerd
 
+- name: Update cobbler signatures
+  command: cobbler signature update
+  register: cobbler_signature_update_result
+  failed_when: >-
+    '*** TASK COMPLETE ***' not in cobbler_signature_update_result.stdout
+  when:
+    - cobbler_update_signatures | bool
+    - cobbler_signatures is undefined
+  notify:
+    - restart cobblerd
+  listen:
+    - update signature
+
 - name: Synchronize cobbler
   command: cobbler sync
   listen:

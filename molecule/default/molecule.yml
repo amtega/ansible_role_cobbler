@@ -1,0 +1,131 @@
+---
+
+dependency:
+  name: galaxy
+  enabled: yes
+  options:
+    ignore-certs: yes
+    ignore-errors: yes
+    role-file: "${MOLECULE_SCENARIO_DIRECTORY}/requirements.yml"
+    requirements-file: "${MOLECULE_SCENARIO_DIRECTORY}/requirements.yml"
+driver:
+  name: vagrant
+  provider:
+    name: virtualbox
+lint: "${MOLECULE_SCENARIO_DIRECTORY}/linters.sh"
+platforms:
+  - name: "centos7-${INSTANCE_UUID:-1}"
+    box: centos/7
+    memory: 1024
+    groups:
+      - molecule_hosts
+      - molecule_hosts_centos
+      - molecule_hosts_centos_7
+provisioner:
+  name: ansible
+  config_options:
+    defaults:
+      callback_enabled: profile_tasks
+      action_plugins: $PWD/action_plugins
+  inventory:
+    hosts:
+      molecule_hosts:
+        vars:
+          cobbler_signature_rhel7:
+            boot_files: []
+            boot_loaders:
+              ppc64:
+                - grub
+              ppc64le:
+                - grub
+            default_kickstart: /var/lib/cobbler/kickstarts/sample.ks
+            initrd_file: initrd(.*)\.img
+            isolinux_ok: no
+            kernel_arch: kernel-(.*).rpm
+            kernel_arch_regex: null
+            kernel_file: vmlinuz(.*)
+            kernel_options: ''
+            kernel_options_post: ''
+            signatures:
+              - Packages
+            supported_arches:
+              - i386
+              - x86_64
+              - ppc64
+              - ppc64le
+            supported_repo_breeds:
+              - rsync
+              - rhn
+              - yum
+            version_file: >-
+              {{ "(redhat|sl|slf|centos|oraclelinux|vzlinux)"
+                 + "-release-(?!notes)([\w]*-)*7(Server)*[\.-]+(.*)\.rpm" }}
+            version_file_regex: null
+
+          cobbler_signature_rhel8:
+            boot_files: []
+            default_kickstart: /var/lib/cobbler/kickstarts/sample.ks
+            initrd_file: initrd(.*)\.img
+            isolinux_ok: no
+            kernel_arch: kernel-(.*).rpm
+            kernel_arch_regex: null
+            kernel_file: vmlinuz(.*)
+            kernel_options: ''
+            kernel_options_post: ''
+            signatures:
+              - BaseOS
+            supported_arches:
+              - i386
+              - x86_64
+              - ppc
+              - ppc64
+              - ppc64le
+            supported_repo_breeds:
+              - rsync
+              - rhn
+              - yum
+            version_file: >-
+              {{ "(redhat|sl|slf|almalinux|centos-linux|oraclelinux|vzlinux)"
+                 + "-release-(?!notes)([\w]*-)*8[\.-]+(.*)\.rpm" }}
+            version_file_regex: null
+
+
+          cobbler_signatures:
+            breeds:
+              redhat:
+                rhel7: "{{ cobbler_signature_rhel7 }}"
+                rhel8: "{{ cobbler_signature_rhel8 }}"
+
+          cobbler_server: >-
+            {{ hostvars[inventory_hostname]
+               ['ansible_eth0']['ipv4']['address'] }}
+
+          cobbler_next_server: >-
+            {{ hostvars[inventory_hostname]
+               ['ansible_eth0']['ipv4']['address'] }}
+
+          cobbler_profiles:
+            - name: CentOS-7-x86_64
+              distro: CentOS-7-x86_64
+              kickstart_content: "%end"
+              state: present
+
+            - name: CentOS-8-x86_64
+              distro: CentOS-8-x86_64
+              kickstart: /var/lib/cobbler/kickstarts/default.ks
+              state: present
+
+          cobbler_systems:
+            - name: 192.168.5.6
+              profile: CentOS-7-x86_64
+              state: present
+
+            - name: 192.168.5.7
+              profile: CentOS-8-x86_64
+              state: present
+
+      molecule_hosts_fedora:
+        vars:
+          ansible_python_interpreter: /usr/bin/python3
+verifier:
+  name: ansible
