@@ -17,7 +17,6 @@
            | list }}
       loop_control:
         loop_var: cobbler_iso_file
-      register: cobbler_umount_isos
 
     - name: Delete distros ISO files
       file:
