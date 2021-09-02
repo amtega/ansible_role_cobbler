@@ -18,7 +18,7 @@
             dest: /tmp/CentOS-7-x86_64
 
           - url: "{{ centos_8_baseurl }}"
-            file: CHECKSUM.asc
+            file: CHECKSUM
             dest: /tmp/CentOS-8-x86_64
 
     - name: Download checksum files
@@ -53,7 +53,7 @@
                     | map("regex_replace", ":", "")
                     | map("regex_replace", "\(", "")
                     | map("regex_replace", "\)", "")
-                    | select("search", "[Mm]inimal")
+                    | select("search", "[Dd][Vv][Dd]")
                     | list
                     | first).split(" ").1 }}
             state: present
