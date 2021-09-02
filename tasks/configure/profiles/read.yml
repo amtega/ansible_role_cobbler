@@ -9,7 +9,9 @@
       register: cobbler_search_profiles_config_files_result
 
     - name: Read profiles config files
-      command: "cat {{ cobbler_profile_config_file }}"
+      shell: "cat {{ cobbler_profile_config_file }} 2>/dev/null || echo ''"
+      args:
+        warn: no
       register: cobbler_read_profiles_config_result
       changed_when: no
       loop: >-
@@ -21,7 +23,9 @@
         label: "{{ (cobbler_profile_config_file | basename | splitext).0 }}"
 
     - name: Read profiles kickstart files
-      command: "cat {{ cobbler_kickstart_file_path }}"
+      shell: "cat {{ cobbler_kickstart_file_path }} 2>/dev/null || echo ''"
+      args:
+        warn: no
       register: cobbler_read_kickstarts_result
       failed_when: no
       changed_when: no

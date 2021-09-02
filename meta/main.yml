@@ -29,8 +29,6 @@ dependencies:
 
   - role: amtega.proxy_client
 
-  - role: amtega.tftpd
-
   - role: amtega.packages
     vars:
       packages_os:
@@ -55,6 +53,8 @@ dependencies:
         fedora:
           all:
             python-libsemanage: present
+
+  - role: amtega.tftpd
 
   - role: amtega.artifact
     tags:

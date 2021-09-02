@@ -89,7 +89,6 @@ provisioner:
                  + "-release-(?!notes)([\w]*-)*8[\.-]+(.*)\.rpm" }}
             version_file_regex: null
 
-
           cobbler_signatures:
             breeds:
               redhat:
