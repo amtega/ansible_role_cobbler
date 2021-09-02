@@ -21,7 +21,9 @@
       register: cobbler_search_distro_config_files_result
 
     - name: Read distros config files
-      command: "cat {{ cobbler_distro_config_file }}"
+      shell: "cat {{ cobbler_distro_config_file }} 2>/dev/null || echo ''"
+      args:
+        warn: no
       register: cobbler_read_distros_config_result
       changed_when: no
       loop: >-

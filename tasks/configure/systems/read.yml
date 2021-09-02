@@ -2,6 +2,7 @@
 # Read systems
 
 - block:
+
     - name: Search systems config files
       find:
         paths: "{{ cobbler_config_dir }}/systems.d"
@@ -9,7 +10,9 @@
       register: cobbler_search_systems_config_files_result
 
     - name: Read systems config files
-      command: "cat {{ cobbler_system_config_file }}"
+      shell: "cat {{ cobbler_system_config_file }} 2>/dev/null || echo ''"
+      args:
+        warn: no
       register: cobbler_read_systems_config_result
       changed_when: no
       loop: >-
