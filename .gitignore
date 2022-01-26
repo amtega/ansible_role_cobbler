@@ -2,7 +2,6 @@
 *.log
 *.tmp
 *.pyc
-tests/CentOS*
 
 .cache
 

@@ -21,11 +21,18 @@ platforms:
       - molecule_hosts
       - molecule_hosts_centos
       - molecule_hosts_centos_7
+  - name: "centos8-${INSTANCE_UUID:-1}"
+    box: centos/8
+    memory: 1024
+    groups:
+      - molecule_hosts
+      - molecule_hosts_centos
+          - molecule_hosts_centos_8
 provisioner:
   name: ansible
   config_options:
     defaults:
-      callback_enabled: profile_tasks
+      callbacks_enabled: profile_tasks
       action_plugins: $PWD/action_plugins
   inventory:
     hosts:
