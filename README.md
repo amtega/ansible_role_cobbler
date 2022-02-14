@@ -22,18 +22,16 @@ This is an example playbook:
 
 ## Testing
 
-Tests are based on docker containers. You can setup docker engine quickly using the playbook `files/setup.yml` available in the role [amtega.docker_engine](https://galaxy.ansible.com/amtega/docker_engine).
-
-Once you have docker, you can run the tests with the following commands:
+Tests are based on [molecule with vagrant virtual machines](https://molecule.readthedocs.io/en/latest/installation.html).
 
 ```shell
-$ cd amtega.cobbler/tests
-$ ansible-playbook main.yml
+cd amtega.cobbler
+molecule test --all
 ```
 
 ## License
 
-Copyright (C) 2020 AMTEGA - Xunta de Galicia
+Copyright (C) 2022 AMTEGA - Xunta de Galicia
 
 This role is free software: you can redistribute it and/or modify it under the terms of:
 

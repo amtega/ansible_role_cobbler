@@ -25,12 +25,18 @@ provisioner:
   name: ansible
   config_options:
     defaults:
-      callback_enabled: profile_tasks
+      callbacks_enabled: profile_tasks
       action_plugins: $PWD/action_plugins
   inventory:
     hosts:
       molecule_hosts:
         vars:
+          cobbler_module_authentication: authz_allowall
+          cobbler_module_authorization: authz_allowall
+          cobbler_module_dhcp: manage_dnsmasq
+          cobbler_module_dns: manage_dnsmasq
+          cobbler_module_tftpd: manage_in_tftpd
+
           cobbler_signature_rhel7:
             boot_files: []
             boot_loaders:
@@ -85,7 +91,7 @@ provisioner:
               - rhn
               - yum
             version_file: >-
-              {{ "(redhat|sl|slf|almalinux|centos-linux|oraclelinux|vzlinux)"
+              {{ "(redhat|sl|slf|almalinux|centos-stream|oraclelinux|vzlinux)"
                  + "-release-(?!notes)([\w]*-)*8[\.-]+(.*)\.rpm" }}
             version_file_regex: null
 
@@ -104,27 +110,24 @@ provisioner:
                ['ansible_eth0']['ipv4']['address'] }}
 
           cobbler_profiles:
-            - name: CentOS-7-x86_64
-              distro: CentOS-7-x86_64
+            - name: profile-0
+              distro: distro-0-x86_64
               kickstart_content: "%end"
               state: present
 
-            - name: CentOS-8-x86_64
-              distro: CentOS-8-x86_64
+            - name: profile-1
+              distro: distro-1-x86_64
+
               kickstart: /var/lib/cobbler/kickstarts/default.ks
               state: present
 
           cobbler_systems:
             - name: 192.168.5.6
-              profile: CentOS-7-x86_64
+              profile: profile-0
               state: present
 
             - name: 192.168.5.7
-              profile: CentOS-8-x86_64
+              profile: profile-1
               state: present
-
-      molecule_hosts_fedora:
-        vars:
-          ansible_python_interpreter: /usr/bin/python3
 verifier:
   name: ansible
