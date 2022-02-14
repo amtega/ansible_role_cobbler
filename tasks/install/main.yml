@@ -2,6 +2,48 @@
 # Install tasks
 
 - block:
+    - name: Enable cobble module in dnf
+      command: dnf module enable cobbler -y
+      when: ansible_facts.distribution_major_version is version("8", ">=")
+      register: cobbler_dnf_module_result
+      changed_when: >-
+        cobbler_dnf_module_result.stdout is not search("Nothing to do.")
+      failed_when: >-
+        cobbler_dnf_module_result.stdout is not search("Complete!")
+      environment:
+        LANGUAGE: en_US
+
+    - name: Setup packages
+      include_role:
+        name: amtega.packages
+      vars:
+        packages_os:
+          all:
+            all:
+              cobbler: present
+              cobbler-web: present
+              curl: present
+              debmirror: present
+              hostname: present
+              httpd: present
+              mod_ssl: present
+              pykickstart: present
+              syslinux: present
+              which: present
+              wget: present
+          centos:
+            7:
+              libsemanage-python: present
+            8:
+              python3-libsemanage: present
+              rsync-daemon: present
+          redhat:
+            7:
+              libsemanage-python: present
+            8:
+              python3-libsemanage: present
+              rsync-daemon: present
+
     - name: Setup rsync xinetd service
       include_role:
         name: amtega.xinetd_service
@@ -17,6 +59,14 @@
         xinetd_service_server: /usr/bin/rsync
         xinetd_service_server_args: "--daemon"
         xinetd_service_flags: IPv4
+      when: ansible_facts.distribution_major_version is version("8", "<")
+
+    - name: Setup rsyncd service
+      service:
+        name: rsyncd
+        state: started
+        enabled: yes
+      when: ansible_facts.distribution_major_version is version("8", ">=")
 
     - name: Create config directories
       file:

@@ -127,6 +127,14 @@ cobbler_proxy_url_ext: >-
 
 cobbler_proxy_url_int: ""
 
+# Cobbler modules
+
+cobbler_module_authentication: authentication.configfile
+cobbler_module_authorization: authorization.allowall
+cobbler_module_dhcp: managers.dnsmasq
+cobbler_module_dns: managers.dnsmasq
+cobbler_module_tftpd: managers.in_tftpd
+
 # List of dicts with the cobbler distros to manage. The format of the list items
 # is:
 #

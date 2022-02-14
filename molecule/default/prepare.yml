@@ -7,8 +7,8 @@
   tasks:
     - name: Setup base urls for CentOS download
       set_fact:
-        centos_7_baseurl: https://ftp.rediris.es/mirror/CentOS/7/isos/x86_64
-        centos_8_baseurl: https://ftp.rediris.es/mirror/CentOS/8/isos/x86_64
+        centos_7_baseurl: >-
+          https://ftp.rediris.es/mirror/CentOS/7/isos/x86_64
 
     - name: Setup facts with info to download checksum files
       set_fact:
@@ -17,9 +17,9 @@
             file: sha256sum.txt
             dest: /tmp/CentOS-7-x86_64
 
-          - url: "{{ centos_8_baseurl }}"
-            file: CHECKSUM
-            dest: /tmp/CentOS-8-x86_64
+          - url: "{{ centos_7_baseurl }}"
+            file: sha256sum.txt
+            dest: /tmp/CentOS-7-x86_64
 
     - name: Download checksum files
       get_url:
@@ -42,26 +42,27 @@
     - name: Parse checksum files
       set_fact:
         distro:
-          - name: "{{ item.dest | basename }}"
+          - name: "distro-{{ index }}-x86_64"
             artifact:
               type: http
               host: "http://{{ item.url | urlsplit('hostname') }}"
               path: "{{ item.url | urlsplit('path') }}"
-              file: >-
-                {{ (read_checksum_files_result.results[index].stdout_lines
-                    | map("regex_replace", " +", " ")
-                    | map("regex_replace", ":", "")
-                    | map("regex_replace", "\(", "")
-                    | map("regex_replace", "\)", "")
-                    | select("search", "[Dd][Vv][Dd]")
-                    | list
-                    | first).split(" ").1 }}
+              file: "{{ minimal_iso }}"
             state: present
       register: checksum_parse_result
       loop: "{{ checksum_files }}"
       loop_control:
         index_var: index
         label: "{{ item.dest }}"
+      vars:
+        minimal_iso: >-
+          {{ ((read_checksum_files_result.results[index].stdout_lines
+              | map("regex_replace", " +", " ")
+              | map("regex_replace", ":", "")
+              | map("regex_replace", "\(", "")
+              | map("regex_replace", "\)", "")
+              | select("search", "[Mm]inimal")
+              | list).0 | default(" none")).split(" ").1 }}
 
     - name: Create file with cobbler distros config
       copy:
