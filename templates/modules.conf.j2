@@ -1,16 +1,16 @@
 {{ ansible_managed | comment }}
 
 [authentication]
-module = authn_configfile
+module = {{ cobbler_module_authentication }}
 
 [authorization]
-module = authz_allowall
+module = {{ cobbler_module_authorization }}
 
 [dhcp]
-module = manage_dnsmasq
+module = {{ cobbler_module_dhcp }}
 
 [dns]
-module = manage_dnsmasq
+module = {{ cobbler_module_dns }}
 
 [tftpd]
-module = manage_in_tftpd
+module = {{ cobbler_module_tftpd }}
