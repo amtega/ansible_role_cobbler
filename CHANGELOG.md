@@ -6,7 +6,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [1.4.0] - 2022-01-19
+## [1.4.1] - 2022-02-14
+### Fixed
+- Fixed changelog.
+
+## [1.4.0] - 2022-02-14
 ### Added
 - Added cobbler_module_* variables.
 
