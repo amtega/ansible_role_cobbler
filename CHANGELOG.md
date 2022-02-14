@@ -7,5 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ## [1.4.0] - 2022-01-19
+### Added
+- Added cobbler_module_* variables.
+
 ### Changed
-- Supported distros. Related to ansible/main#178
+- Migrated tests to molecule.
