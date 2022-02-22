@@ -31,13 +31,7 @@
               syslinux: present
               which: present
               wget: present
-          centos:
-            7:
-              libsemanage-python: present
-            8:
-              python3-libsemanage: present
-              rsync-daemon: present
-          redhat:
+          all:
             7:
               libsemanage-python: present
             8:
