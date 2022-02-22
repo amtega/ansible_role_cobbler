@@ -31,7 +31,6 @@
               syslinux: present
               which: present
               wget: present
-          all:
             7:
               libsemanage-python: present
             8:
