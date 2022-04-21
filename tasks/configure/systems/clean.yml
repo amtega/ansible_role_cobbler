@@ -2,6 +2,22 @@
 # Cleanup systems
 
 - block:
+    - name: Delete older systems
+      shell: >-
+        set -o pipefail ;
+        test -d {{ cobbler_config_dir }}/systems.d
+        && find {{ cobbler_config_dir }}/systems.d
+        -mindepth 1
+        -mmin +$(({{ cobbler_delete_systems_older_n_minutes }}))
+        -delete -print
+        || /bin/true
+      args:
+        warn: no
+      when: cobbler_delete_systems_older_n_minutes | default("") | length > 0
+      register: cobbler_delete_older_systems_result
+      changed_when: >-
+        cobbler_delete_older_systems_result.stdout_lines | length > 0
+
     - include_tasks: read.yml
 
     - name: Delete systems to be updated or not found in inventory
@@ -13,9 +29,9 @@
         cobbler_saved_system.name in cobbler_absent_systems_names
         or (cobbler_delete_unmanaged | bool
             and cobbler_saved_system.name not in cobbler_present_systems_names)
-        or cobbler_saved_system.name in cobbler_updated_systems.keys() | list
+        or cobbler_saved_system.name in _cobbler_updated_systems.keys() | list
       register: cobbler_delete_systems_result
-      loop: "{{ cobbler_saved_systems.values() | list }}"
+      loop: "{{ _cobbler_saved_systems.values() | list }}"
       loop_control:
         loop_var: cobbler_saved_system
         label: "{{ cobbler_saved_system.name }}"

@@ -242,6 +242,10 @@ cobbler_delete_unmanaged: yes
 
 cobbler_systems_only: no
 
+# Tells the role to delete systems configs older than n minutes ago.
+
+#cobbler_delete_systems_older_n_minutes:
+
 # Hide sensitive information
 
 cobbler_no_log: yes
