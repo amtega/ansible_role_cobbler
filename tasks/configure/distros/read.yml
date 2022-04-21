@@ -32,6 +32,13 @@
            | list }}
       loop_control:
         loop_var: cobbler_distro_config_file
+
+    - name: Setup facts with distros info
+      set_fact:
+        _cobbler_saved_distros: >-
+          {{ lookup('template', 'saved_distros.yml.j2') | from_yaml }}
+        _cobbler_updated_distros: >-
+          {{ lookup('template', 'updated_distros.yml.j2') | from_yaml }}
   tags:
     - role::cobbler
     - role::cobbler::configure
