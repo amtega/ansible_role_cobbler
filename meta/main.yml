@@ -12,7 +12,7 @@ galaxy_info:
   platforms:
     - name: EL
       versions:
-        - 7
+        - 8
   galaxy_tags:
     - system
     - cobbler
@@ -21,8 +21,12 @@ dependencies:
   - role: amtega.check_platform
     vars:
       check_platform_distributions:
-        centos: 7
-        redhat: 7
+        centos: 8
+        redhat: 8
+
+  - role: amtega.selinux
+    vars:
+      selinux_mode: permissive
 
   - role: amtega.epel
   - role: amtega.proxy_client

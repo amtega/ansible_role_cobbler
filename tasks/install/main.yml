@@ -3,7 +3,7 @@
 
 - block:
     - name: Enable cobble module in dnf
-      command: dnf module enable cobbler -y
+      command: dnf module enable cobbler:3 -y
       when: ansible_facts.distribution_major_version is version("8", ">=")
       register: cobbler_dnf_module_result
       changed_when: >-
@@ -31,28 +31,8 @@
               syslinux: present
               which: present
               wget: present
-            7:
-              libsemanage-python: present
-            8:
               python3-libsemanage: present
               rsync-daemon: present
-
-    - name: Setup rsync xinetd service
-      include_role:
-        name: amtega.xinetd_service
-      vars:
-        xinetd_service_name: rsync
-        xinetd_service_id: rsync
-        xinetd_service_package: rsync
-        xinetd_service_disable: no
-        xinetd_service_socket_type: stream
-        xinetd_service_protocol: tcp
-        xinetd_service_wait: no
-        xinetd_service_user: root
-        xinetd_service_server: /usr/bin/rsync
-        xinetd_service_server_args: "--daemon"
-        xinetd_service_flags: IPv4
-      when: ansible_facts.distribution_major_version is version("8", "<")
 
     - name: Setup rsyncd service
       service:
@@ -76,15 +56,6 @@
       loop_control:
         loop_var: cobbler_dir
 
-    - name: Patch bug in cobbler action check
-      patch:
-        src: "cobbler_action_check.patch"
-        dest: "/usr/lib/python2.6/site-packages/cobbler/action_check.py"
-      when: ansible_facts.distribution_major_version is version ("6", "==")
-      notify: restart cobblerd
-      tags:
-        - role::cobbler::install::patch
-
     - name: Setup syslinux boot files into tftp
       copy:
         src: "/usr/share/syslinux/{{ cobbler_loader_item }}"
@@ -96,6 +67,7 @@
         - pxelinux.0
       loop_control:
         loop_var: cobbler_loader_item
+
   tags:
     - role::cobbler
     - role::cobbler::install
