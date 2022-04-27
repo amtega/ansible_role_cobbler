@@ -5,7 +5,7 @@
 
     - name: Search systems config files
       find:
-        paths: "{{ cobbler_config_dir }}/systems.d"
+        paths: "{{ cobbler_config_dir }}/systems"
         file_type: file
       register: cobbler_search_systems_config_files_result
 

@@ -16,7 +16,7 @@
 
     - name: Search distros config files
       find:
-        paths: "{{ cobbler_config_dir }}/distros.d"
+        paths: "{{ cobbler_config_dir }}/distros"
         file_type: file
       register: cobbler_search_distro_config_files_result
 

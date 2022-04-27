@@ -2,6 +2,9 @@
 
 [authentication]
 module = {{ cobbler_module_authentication }}
+{%if cobbler_module_authentication == "authentication.configfile" %}
+hash_algorithm = {{ cobbler_module_hash_algorithm }}
+{% endif %}
 
 [authorization]
 module = {{ cobbler_module_authorization }}

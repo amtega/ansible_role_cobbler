@@ -7,7 +7,7 @@
         cobbler system add
         --name={{ cobbler_system.name }}
         --profile={{ cobbler_system.profile }}
-        --kopts="{{ cobbler_system.kopts | default([]) | join(' ') }}"
+        --kernel-options="{{ cobbler_system.kopts | default([]) | join(' ') }}"
       register: cobbler_system_add_result
       loop: >-
         {{ cobbler_updated_systems.values()

@@ -2,13 +2,14 @@
 # Add profiles
 
 - block:
-    - name: Create profiles kickstart files
+    - name: Create profiles autoinstall files
       copy:
-        dest: "{{ cobbler_kickstart_files_dir }}/{{ cobbler_kickstart_file }}"
-        content: "{{ cobbler_profile.kickstart_content }}"
+        dest: >-
+          {{ cobbler_autoinstall_templates_dir }}/{{ cobbler_autoinstall_file }}
+        content: "{{ cobbler_profile.autoinstall_content }}"
         mode: 0755
-      register: cobbler_kickstart_add_result
-      when: cobbler_profile.kickstart_content is defined
+      register: cobbler_autoinstall_add_result
+      when: cobbler_profile.autoinstall_content is defined
       loop: "{{ cobbler_updated_profiles.values() | list }}"
       loop_control:
         loop_var: cobbler_profile
@@ -19,9 +20,9 @@
         cobbler profile add
         --name={{ cobbler_profile.name }}
         --distro={{ cobbler_profile.distro }}
-        --kopts="{{ cobbler_profile.kopts | default([]) | join(' ') }}"
-        {{ (cobbler_profile_kickstart | length > 0)
-           | ternary("--kickstart=" + cobbler_profile_kickstart, "") }}
+        --kernel-options="{{ cobbler_profile_kernel_options }}"
+        {{ (cobbler_profile_autoinstall | length > 0)
+           | ternary("--autoinstall=" + cobbler_profile_autoinstall, "") }}
         {{ (cobbler_profile.parent | default('') | length > 0)
            | ternary("--parent=" + cobbler_profile.parent | default(''), "") }}
         {{ (cobbler_profile.proxy | default('') | length > 0)
@@ -32,11 +33,14 @@
         loop_var: cobbler_profile
         label: "{{ cobbler_profile.name }}"
       vars:
-        cobbler_profile_kickstart: >-
-          {{ (cobbler_profile.kickstart_content | default("") | length > 0)
-             | ternary(cobbler_kickstart_file_path,
-                       (cobbler_profile.kickstart | default("") | length > 0)
-                       | ternary(cobbler_profile.kickstart, "")) }}
+        cobbler_profile_autoinstall: >-
+          {{ (cobbler_profile.autoinstall_content | default("") | length > 0)
+             | ternary(cobbler_autoinstall_file,
+                       (cobbler_profile.autoinstall | default("") | length > 0)
+                       | ternary(cobbler_profile.autoinstall, "")) }}
+        cobbler_profile_kernel_options: >-
+          {{ lookup('template', 'kernel_options.yml.j2') | from_yaml }}
+
   tags:
     - role::cobbler
     - role::cobbler::configure

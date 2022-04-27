@@ -1,0 +1,3 @@
+{%- for kopt in (cobbler_profile.kopts | default({})).keys() | list -%}
+{{ kopt }}={{ cobbler_profile.kopts[kopt] }}{{" "}}
+{%- endfor -%}

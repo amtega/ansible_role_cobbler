@@ -3,7 +3,7 @@
 
 # Cobbler config directory
 
-cobbler_config_dir: /var/lib/cobbler/config
+cobbler_config_dir: /var/lib/cobbler/collections
 
 # Cobbler temporary directory
 
@@ -27,16 +27,31 @@ cobbler_anamon_enabled: no
 cobbler_authn_pam_service: login
 cobbler_auth_token_expiration: 3600
 
+cobbler_autoinstall_snippets_dir: /var/lib/cobbler/snippets
+cobbler_autoinstall_templates_dir: /var/lib/cobbler/templates
+cobbler_default_autoinstall: /var/lib/cobbler/templates/default.ks
+
+cobbler_boot_loader_conf_template_dir: "/etc/cobbler/boot_loader_conf"
+
+cobbler_build_reporting_enabled: no
+cobbler_build_reporting_sender: '""'
+cobbler_build_reporting_email: [ 'root@localhost' ]
+cobbler_build_reporting_smtp_server: "localhost"
+cobbler_build_reporting_subject: '""'
+cobbler_build_reporting_ignorelist: []
+
+cobbler_cache_enabled: yes
+
 cobbler_cheetah_import_whitelist:
   - random
   - re
   - time
+  - netaddr
 
 cobbler_createrepo_flags: -c cache -s sha
 
-cobbler_default_kickstart: /var/lib/cobbler/kickstarts/default.ks
-
 cobbler_default_name_servers: []
+cobbler_default_name_servers_search: []
 
 cobbler_default_ownership:
   - admin
@@ -45,38 +60,70 @@ cobbler_default_password_crypted: $1$hZtCu.xn$OcfOoLF7907a.3rd73PqK1
 
 cobbler_default_template_type: cheetah
 
+cobbler_default_virt_bridge: xenbr0
+cobbler_default_virt_file_size: 5
+cobbler_default_virt_ram: 512
+cobbler_default_virt_type: xenpv
+
 cobbler_enable_gpxe: no
 
 cobbler_enable_menu: yes
 
 cobbler_http_port: 80
 
+cobbler_include: [ "/etc/cobbler/settings.d/*.settings" ]
+
 cobbler_kernel_options:
   ksdevice: bootif
-  lang: ' '
+  lang: '""'
   text: ~
+
+cobbler_ldap_server: "ldap.example.com"
+cobbler_ldap_base_dn: "DC=example,DC=com"
+cobbler_ldap_port: 389
+cobbler_ldap_tls: yes
+cobbler_ldap_anonymous_bind: yes
+cobbler_ldap_search_bind_dn: '""'
+cobbler_ldap_search_passwd: '""'
+cobbler_ldap_search_prefix: 'uid='
+cobbler_ldap_tls_cacertfile: '""'
+cobbler_ldap_tls_keyfile: '""'
+cobbler_ldap_tls_certfile: '""'
+
+cobbler_mgmt_classes: []
+cobbler_mgmt_parameters:
+  from_cobbler: "true"
+
+cobbler_puppet_auto_setup: no
+cobbler_sign_puppet_certs_automatically: no
+cobbler_puppetca_path: "/usr/bin/puppet"
+cobbler_remove_old_puppet_certs_automatically: no
+cobbler_puppet_parameterized_classes: yes
 
 cobbler_manage_dhcp: no
 cobbler_manage_dns: no
+cobbler_bind_chroot_path: '""'
+cobbler_bind_master: 127.0.0.1
 cobbler_manage_tftpd: no
+cobbler_tftpboot_location: "/var/lib/tftpboot"
 cobbler_manage_rsync: no
-
+cobbler_manage_forward_zones: []
+cobbler_manage_reverse_zones: []
 cobbler_next_server: "{{ ansible_facts.default_ipv4.address }}"
 
+cobbler_power_management_default_type: 'ipmilan'
+
 cobbler_pxe_just_once: yes
+cobbler_nopxe_with_triggers: yes
 
-cobbler_pxe_template_dir: /etc/cobbler/pxe
-
-cobbler_consoles: /var/consoles
-
-cobbler_redhat_management_type: "off"
 cobbler_redhat_management_server: xmlrpc.rhn.redhat.com
-cobbler_redhat_management_key: ""
+cobbler_redhat_management_key: '""'
 cobbler_redhat_management_permissive: no
 
 cobbler_register_new_installs: no
 
 cobbler_reposync_flags: -l -n -d
+cobbler_reposync_rsync_flags: "-rltDv --copy-unsafe-links"
 
 cobbler_restart_dns: yes
 cobbler_restart_dhcp: yes
@@ -105,9 +152,24 @@ cobbler_client_use_https: no
 
 cobbler_snippetsdir: /var/lib/cobbler/snippets
 
-cobbler_template_remote_kickstarts: no
+cobbler_virt_auto_boot: yes
 
 cobbler_webdir: /var/www/cobbler
+cobbler_webdir_whitelist:
+  - misc
+  - web
+  - webui
+  - localmirror
+  - repo_mirror
+  - distro_mirror
+  - images
+  - links
+  - pub
+  - repo_profile
+  - repo_system
+  - svc
+  - rendered
+  - .link_cache
 
 cobbler_xmlrpc_port: 25151
 
@@ -125,11 +187,17 @@ cobbler_always_write_dhcp_entries: no
 cobbler_proxy_url_ext: >-
   {{ proxy_client_http_proxy | default(proxy_client_https_proxy) }}
 
-cobbler_proxy_url_int: ""
+cobbler_proxy_url_int: '""'
+
+cobbler_scm_track_enabled: no
+cobbler_scm_track_mode: "git"
+cobbler_scm_track_author: "cobbler <cobbler@localhost>"
+cobbler_scm_push_script: "/bin/true"
 
 # Cobbler modules
 
 cobbler_module_authentication: authentication.configfile
+cobbler_module_hash_algorithm: sha3_512
 cobbler_module_authorization: authorization.allowall
 cobbler_module_dhcp: managers.dnsmasq
 cobbler_module_dns: managers.dnsmasq
@@ -181,17 +249,16 @@ cobbler_distros: []
 # List of cobbler profiles to manage. The format of the list items is:
 #
 # {
-#   name: <name>                  # Name of the profile
-#   distro: <distro>              # Name of a previously defined distro
-#   kickstart: <path>             # Local filesystem path to a kickstart file.
-#                                 # Defaults to
-#                                 # /var/lib/cobbler/kickstarts/default.ks
-#   kickstart_content: <content>  # String with the content of the kickstart
-#                                 # file (optional)
-#   kopts: <kopts>                # Kernel command-line arguments (optional)
-#   parent: <profile>             # Parent profile (optional)
-#   proxy: <proxy>                # Proxy to use during the installation stage
-#   state: <state>                # Can be present or absent
+#   name: <name>                   # Name of the profile
+#   distro: <distro>               # Name of a previously defined distro
+#   autoinstall: <filename>        # Filename of autoinstall file.
+#                                  # Defaults to default.ks
+#   autoinstall_content: <content> # String with the content of the autoinstall
+#                                  # file (optional)
+#   kopts: <kopts>                 # Kernel command-line arguments (optional)
+#   parent: <profile>              # Parent profile (optional)
+#   proxy: <proxy>                 # Proxy to use during the installation stage
+#   state: <state>                 # Can be present or absent
 # }
 #
 # Samples:
@@ -212,9 +279,10 @@ cobbler_profiles: []
 # {
 #   name: <name>         # Name of the system
 #   profile: <profile>   # Name of a previously defined profile
-#   kopts: <kopts>       # Kernel command-line arguments (optional)
+#   kopts: <kopts>       # Dict with kernel command-line arguments (optional)
 #   state: <state>       # Can be present or absent (optional)
 # }
+#
 #
 #
 # Samples:
@@ -223,6 +291,9 @@ cobbler_profiles: []
 #   - name: 192.168.5.6
 #     profile: CentOS-6
 #     state: present
+#     kopts:
+#       baz: "3"
+#       foo: "bar"
 #
 #   - name: 192.168.5.7
 #     profile: CentOS-7

@@ -2,10 +2,10 @@
 #  Setup cobbler settings files
 
 - block:
-    - name: Configure /etc/cobbler/settings
+    - name: Configure /etc/cobbler/settings.yaml
       template:
         src: settings.j2
-        dest: "{{ cobbler_main_config_dir }}/settings"
+        dest: "{{ cobbler_main_config_dir }}/settings.yaml"
         owner: root
         group: root
         mode: 0644
