@@ -14,13 +14,13 @@ driver:
     name: virtualbox
 lint: "${MOLECULE_SCENARIO_DIRECTORY}/linters.sh"
 platforms:
-  - name: "centos7-${INSTANCE_UUID:-1}"
-    box: centos/7
-    memory: 1024
+  - name: "centos8-${INSTANCE_UUID:-1}"
+    box: centos/stream8
+    memory: 2048
     groups:
       - molecule_hosts
       - molecule_hosts_centos
-      - molecule_hosts_centos_7
+      - molecule_hosts_centos_8
 provisioner:
   name: ansible
   config_options:
@@ -31,11 +31,11 @@ provisioner:
     hosts:
       molecule_hosts:
         vars:
-          cobbler_module_authentication: authz_allowall
-          cobbler_module_authorization: authz_allowall
-          cobbler_module_dhcp: manage_dnsmasq
-          cobbler_module_dns: manage_dnsmasq
-          cobbler_module_tftpd: manage_in_tftpd
+          cobbler_module_authentication: authentication.configfile
+          cobbler_module_authorization: authorization.allowall
+          cobbler_module_dhcp: managers.dnsmasq
+          cobbler_module_dns: managers.dnsmasq
+          cobbler_module_tftpd: managers.in_tftpd
 
           cobbler_signature_rhel7:
             boot_files: []
@@ -44,7 +44,7 @@ provisioner:
                 - grub
               ppc64le:
                 - grub
-            default_kickstart: /var/lib/cobbler/kickstarts/sample.ks
+            default_autoinstall: default.ks
             initrd_file: initrd(.*)\.img
             isolinux_ok: no
             kernel_arch: kernel-(.*).rpm
@@ -70,7 +70,7 @@ provisioner:
 
           cobbler_signature_rhel8:
             boot_files: []
-            default_kickstart: /var/lib/cobbler/kickstarts/sample.ks
+            default_autoinstall: default.ks
             initrd_file: initrd(.*)\.img
             isolinux_ok: no
             kernel_arch: kernel-(.*).rpm
@@ -112,13 +112,15 @@ provisioner:
           cobbler_profiles:
             - name: profile-0
               distro: distro-0-x86_64
-              kickstart_content: "%end"
+              autoinstall_content: "%end"
               state: present
+              kopts:
+                baz: "3"
+                foo: "bar"
 
             - name: profile-1
               distro: distro-1-x86_64
-
-              kickstart: /var/lib/cobbler/kickstarts/default.ks
+              autoinstall: default.ks
               state: present
 
           cobbler_systems:

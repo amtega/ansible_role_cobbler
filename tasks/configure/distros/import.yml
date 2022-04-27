@@ -69,11 +69,11 @@
         loop_var: cobbler_distro
         label: "{{ cobbler_distro.name }}"
 
-    - name: Add ksmeta attributes to distros config
+    - name: Add autoinstall-meta attributes to distros config
       command: >-
         cobbler distro edit
         --name={{ cobbler_distro.name }}
-        --ksmeta='iso_file={{ cobbler_distro.artifact.file }}'
+        --autoinstall-meta='iso_file={{ cobbler_distro.artifact.file }}'
       when: cobbler_import_result.results[cobbler_distro_index] is changed
       register: cobbler_add_ksmeta_result
       loop: "{{ cobbler_updated_distros.values() | list }}"

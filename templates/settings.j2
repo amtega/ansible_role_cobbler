@@ -1,24 +1,41 @@
 {{ ansible_managed | comment }}
 
-allow_duplicate_hostnames: {{ cobbler_allow_duplicate_hostnames | int }}
-allow_duplicate_ips: {{ cobbler_allow_duplicate_ips | int }}
-allow_duplicate_macs: {{ cobbler_allow_duplicate_macs | int }}
-allow_dynamic_settings: {{ cobbler_allow_dynamic_settings | int }}
+allow_duplicate_hostnames: {{ cobbler_allow_duplicate_hostnames | bool }}
+allow_duplicate_ips: {{ cobbler_allow_duplicate_ips | bool }}
+allow_duplicate_macs: {{ cobbler_allow_duplicate_macs | bool }}
+allow_dynamic_settings: {{ cobbler_allow_dynamic_settings | bool }}
 
-anamon_enabled: {{ cobbler_anamon_enabled | int }}
+anamon_enabled: {{ cobbler_anamon_enabled | bool }}
 
 authn_pam_service: {{ cobbler_authn_pam_service }}
 auth_token_expiration: {{ cobbler_auth_token_expiration }}
+
+autoinstall_snippets_dir: {{ cobbler_autoinstall_snippets_dir }}
+autoinstall_templates_dir: {{ cobbler_autoinstall_templates_dir }}
+default_autoinstall: {{ cobbler_default_autoinstall }}
+
+boot_loader_conf_template_dir: {{ cobbler_boot_loader_conf_template_dir }}
+
+build_reporting_enabled: {{ cobbler_build_reporting_enabled | bool }}
+build_reporting_sender: {{ cobbler_build_reporting_sender }}
+build_reporting_email:
+{{ cobbler_build_reporting_email | to_nice_yaml | indent(width=2, indentfirst=True) }}
+build_reporting_smtp_server: {{ cobbler_build_reporting_smtp_server }}
+build_reporting_subject: {{ cobbler_build_reporting_subject }}
+build_reporting_ignorelist:
+{{ cobbler_build_reporting_ignorelist | to_nice_yaml | indent(width=2, indentfirst=True) }}
+
+cache_enabled: {{ cobbler_cache_enabled }}
 
 cheetah_import_whitelist:
 {{ cobbler_cheetah_import_whitelist | to_nice_yaml | indent(width=2, indentfirst=True) }}
 
 createrepo_flags: {{ cobbler_createrepo_flags }}
 
-default_kickstart: {{ cobbler_default_kickstart }}
-
 default_name_servers:
 {{ cobbler_default_name_servers | to_nice_yaml | indent(width=2, indentfirst=True) }}
+default_name_servers_search:
+{{ cobbler_default_name_servers_search | to_nice_yaml | indent(width=2, indentfirst=True) }}
 
 default_ownership:
 {{ cobbler_default_ownership | to_nice_yaml | indent(width=2, indentfirst=True) }}
@@ -27,41 +44,80 @@ default_password_crypted: {{ cobbler_default_password_crypted }}
 
 default_template_type: {{ cobbler_default_template_type }}
 
-enable_gpxe: {{ cobbler_enable_gpxe | int }}
+default_virt_bridge: {{ cobbler_default_virt_bridge }}
+default_virt_file_size: {{ cobbler_default_virt_file_size}}
+default_virt_ram: {{ cobbler_default_virt_ram }}
+default_virt_type: {{ cobbler_default_virt_type }}
 
-enable_menu: {{ cobbler_enable_menu | int }}
+enable_gpxe: {{ cobbler_enable_gpxe | bool }}
+
+enable_menu: {{ cobbler_enable_menu | bool }}
 
 http_port: {{ cobbler_http_port }}
 
 kernel_options:
 {{ cobbler_kernel_options | to_nice_yaml | indent(width=2, indentfirst=True) }}
 
-manage_dhcp: {{ cobbler_manage_dhcp | int }}
-manage_dns: {{ cobbler_manage_dns | int }}
-manage_tftpd: {{ cobbler_manage_tftpd | int }}
-manage_rsync: {{ cobbler_manage_rsync | int }}
+
+ldap_server: {{ cobbler_ldap_server }}
+ldap_base_dn: {{ cobbler_ldap_base_dn }}
+ldap_port: {{ cobbler_ldap_port }}
+ldap_tls: {{ cobbler_ldap_tls | bool }}
+ldap_anonymous_bind: {{ cobbler_ldap_anonymous_bind | bool }}
+ldap_search_bind_dn: {{ cobbler_ldap_search_bind_dn }}
+ldap_search_passwd: {{ cobbler_ldap_search_passwd }}
+ldap_search_prefix: {{ cobbler_ldap_search_prefix }}
+ldap_tls_cacertfile: {{ cobbler_ldap_tls_cacertfile }}
+ldap_tls_keyfile: {{ cobbler_ldap_tls_keyfile }}
+ldap_tls_certfile: {{ cobbler_ldap_tls_certfile}}
+
+mgmt_classes:
+{{ cobbler_mgmt_classes | to_nice_yaml | indent(width=2, indentfirst=True) }}
+mgmt_parameters:
+{{ cobbler_mgmt_parameters | to_nice_yaml | indent(width=2, indentfirst=True) }}
+
+puppet_auto_setup: {{ cobbler_puppet_auto_setup | bool }}
+sign_puppet_certs_automatically: {{ cobbler_sign_puppet_certs_automatically | bool }}
+puppetca_path: {{ cobbler_puppetca_path }}
+remove_old_puppet_certs_automatically: {{ cobbler_remove_old_puppet_certs_automatically | bool }}
+puppet_parameterized_classes: {{ cobbler_puppet_parameterized_classes | bool }}
+
+manage_dhcp: {{ cobbler_manage_dhcp | bool }}
+
+manage_dns: {{ cobbler_manage_dns | bool }}
+bind_chroot_path: {{ cobbler_bind_chroot_path }}
+bind_master: {{ cobbler_bind_master }}
+
+manage_tftpd: {{ cobbler_manage_tftpd | bool }}
+tftpboot_location: {{ cobbler_tftpboot_location }}
+
+manage_rsync: {{ cobbler_manage_rsync | bool }}
+
+manage_forward_zones:
+{{ cobbler_manage_forward_zones | to_nice_yaml | indent(width=2, indentfirst=True) }}
+manage_reverse_zones:
+{{ cobbler_manage_reverse_zones | to_nice_yaml | indent(width=2, indentfirst=True) }}
 
 next_server: {{ cobbler_next_server }}
 
-pxe_just_once: {{ cobbler_pxe_just_once | int }}
+power_management_default_type: {{ cobbler_power_management_default_type }}
 
-pxe_template_dir: {{ cobbler_pxe_template_dir }}
+pxe_just_once: {{ cobbler_pxe_just_once | bool }}
+nopxe_with_triggers: {{ cobbler_nopxe_with_triggers | bool }}
 
-consoles: {{ cobbler_consoles }}
-
-redhat_management_type: {{ cobbler_redhat_management_type }}
 redhat_management_server: {{ cobbler_redhat_management_server }}
 redhat_management_key: {{ cobbler_redhat_management_key }}
-redhat_management_permissive: {{ cobbler_redhat_management_permissive | int }}
+redhat_management_permissive: {{ cobbler_redhat_management_permissive | bool }}
 
-register_new_installs: {{ cobbler_register_new_installs | int }}
+register_new_installs: {{ cobbler_register_new_installs | bool }}
 
 reposync_flags: {{ cobbler_reposync_flags }}
+reposync_rsync_flags: {{ cobbler_reposync_rsync_flags }}
 
-restart_dns: {{ cobbler_restart_dns | int }}
-restart_dhcp: {{ cobbler_restart_dhcp | int }}
+restart_dns: {{ cobbler_restart_dns | bool }}
+restart_dhcp: {{ cobbler_restart_dhcp | bool }}
 
-run_install_triggers: {{ cobbler_run_install_triggers | int }}
+run_install_triggers: {{ cobbler_run_install_triggers | bool }}
 
 server: {{ cobbler_server }}
 
@@ -69,27 +125,35 @@ server: {{ cobbler_server }}
 signature_url: {{ cobbler_signatures_url }}
 {% endif %}
 
-client_use_localhost: {{ cobbler_client_use_localhost | int }}
-client_use_https: {{ cobbler_client_use_https | int }}
+client_use_localhost: {{ cobbler_client_use_localhost | bool }}
+client_use_https: {{ cobbler_client_use_https | bool }}
 
-snippetsdir: {{ cobbler_snippetsdir }}
-
-template_remote_kickstarts: {{ cobbler_template_remote_kickstarts | int }}
+virt_auto_boot: {{ cobbler_virt_auto_boot | bool }}
 
 webdir: {{ cobbler_webdir }}
+webdir_whitelist:
+{{ cobbler_webdir_whitelist | to_nice_yaml | indent(width=2, indentfirst=True) }}
 
 xmlrpc_port: {{ cobbler_xmlrpc_port }}
 
-yum_post_install_mirror: {{ cobbler_yum_post_install_mirror | int }}
+yum_post_install_mirror: {{ cobbler_yum_post_install_mirror | bool }}
 yum_distro_priority: {{ cobbler_yum_post_install_mirror | int }}
 yumdownloader_flags: {{ cobbler_yumdownloader_flags }}
 
-serializer_pretty_json: {{ cobbler_serializer_pretty_json | int }}
+serializer_pretty_json: {{ cobbler_serializer_pretty_json | bool }}
 
 replicate_rsync_options: {{ cobbler_replicate_rsync_options }}
 replicate_repo_rsync_options: {{ cobbler_replicate_repo_rsync_options }}
 
-always_write_dhcp_entries: {{ cobbler_always_write_dhcp_entries | int }}
+always_write_dhcp_entries: {{ cobbler_always_write_dhcp_entries | bool }}
 
-proxy_url_ext: {{ cobbler_proxy_url_ext }}
+proxy_url_ext: {{ (cobbler_proxy_url_ext | length > 0) | ternary(cobbler_proxy_url_ext, "\"\"") }}
 proxy_url_int: {{ cobbler_proxy_url_int }}
+
+scm_track_enabled: {{ cobbler_scm_track_enabled | bool }}
+scm_track_mode: {{ cobbler_scm_track_mode }}
+scm_track_author: {{ cobbler_scm_track_author }}
+scm_push_script: {{ cobbler_scm_push_script }}
+
+include:
+{{ cobbler_include | to_nice_yaml | indent(width=2, indentfirst=True) }}

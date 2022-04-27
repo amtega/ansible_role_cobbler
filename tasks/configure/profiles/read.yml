@@ -4,7 +4,7 @@
 - block:
     - name: Search profiles config files
       find:
-        paths: "{{ cobbler_config_dir }}/profiles.d"
+        paths: "{{ cobbler_config_dir }}/profiles"
         file_type: file
       register: cobbler_search_profiles_config_files_result
 
@@ -22,11 +22,11 @@
         loop_var: cobbler_profile_config_file
         label: "{{ (cobbler_profile_config_file | basename | splitext).0 }}"
 
-    - name: Read profiles kickstart files
-      shell: "cat {{ cobbler_kickstart_file_path }} 2>/dev/null || echo ''"
+    - name: Read profiles autoinstall files
+      shell: "cat {{ cobbler_autoinstall_file_path }} 2>/dev/null || echo ''"
       args:
         warn: no
-      register: cobbler_read_kickstarts_result
+      register: cobbler_read_autoinstalls_result
       failed_when: no
       changed_when: no
       loop: >-
