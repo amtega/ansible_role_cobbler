@@ -17,8 +17,6 @@
       loop_control:
         loop_var: cobbler_system
         label: "{{ cobbler_system.name }}"
-  vars:
-    cobbler_kickstart_file: "system_{{ cobbler_system.name }}.ks"
   tags:
     - role::cobbler
     - role::cobbler::configure

@@ -1,6 +1,13 @@
 ---
 # Configure cobbler tasks
 
+- name: Configure cobbler selinux
+  include_tasks: selinux.yml
+  tags:
+    - role::cobbler
+    - role::cobbler::configure
+    - role::cobbler::configure::selinux
+
 - name: Configure cobbler settings
   include_tasks: settings.yml
   tags:

@@ -1,0 +1,14 @@
+{{ ansible_managed | comment }}
+
+module {{ cobbler_selinux_patch_module_name }} 1.0;
+
+require {
+        type httpd_config_t;
+        type cobblerd_t;
+        class dir search;
+        class capability dac_override;
+}
+
+#============= cobblerd_t ==============
+allow cobblerd_t httpd_config_t:dir search;
+allow cobblerd_t self:capability dac_override;

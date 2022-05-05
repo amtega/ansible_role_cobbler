@@ -1,0 +1,52 @@
+---
+# Configure service tasks
+
+- block:
+    - name: Configure cobbler selinux booleans
+      seboolean:
+        name: "{{ cobbler_selinux_bool }}"
+        state: yes
+        persistent: yes
+      loop: "{{ cobbler_selinux_booleans }}"
+      loop_control:
+        loop_var: cobbler_selinux_bool
+      when: ansible_facts.selinux.status == "enabled"
+
+    - name: Check selinux modules
+      command: semodule -l
+      register: cobbler_search_selinux_modules
+      changed_when: no
+
+    - block:
+        - name: Create custom selinux module rules file
+          template:
+            src: selinux_module.te.j2
+            dest: "{{ cobbler_selinux_te_file_path }}"
+            owner: root
+            group: root
+            mode: 0644
+
+        - name: Compile custom module
+          command: >-
+            checkmodule -M -m
+            -o {{ cobbler_selinux_mod_file_path }}
+            {{ cobbler_selinux_te_file_path }}
+
+        - name: Package custom module
+          command: >-
+            semodule_package
+            -o {{ cobbler_selinux_pp_file_path }}
+            -m {{ cobbler_selinux_mod_file_path }}
+
+        - name: Install custom module
+          command: "semodule -i {{ cobbler_selinux_pp_file_path }}"
+      when:
+        - >-
+          cobbler_search_selinux_modules.stdout
+          is not search("{{ cobbler_selinux_patch_module_name }}")
+        - cobbler_selinux_mode == "enforcing"
+
+  tags:
+    - role::cobbler
+    - role::cobbler::configure
+    - role::cobbler::configure::service
