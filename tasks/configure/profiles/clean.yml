@@ -4,14 +4,6 @@
 - block:
     - include_tasks: read.yml
 
-    - name: debug saved profiles
-      debug:
-        var: cobbler_saved_profiles
-
-    - name: debug profiles
-      debug:
-        var: cobbler_profiles
-        
     - name: Delete profiles to be updated or not found in inventory
       command: >-
         cobbler profile remove \

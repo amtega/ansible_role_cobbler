@@ -316,3 +316,29 @@ cobbler_systems_only: no
 # Hide sensitive information
 
 cobbler_no_log: yes
+
+# Cobbler selinux mode. Can be enforcing or permissive
+cobbler_selinux_mode: enforcing
+
+# We need to create a custom selinux rule because Cobbler doesn't support
+# selinux activation. Reference: https://github.com/cobbler/cobbler/issues/2183
+cobbler_selinux_patch_module_name: MyCobblerModule
+
+# Path to type enforcement custom module file
+cobbler_selinux_te_file_path: "/tmp/{{ cobbler_selinux_patch_module_name }}.te"
+
+# Path to selinux custom compiled custom module
+cobbler_selinux_mod_file_path: "/tmp/{{cobbler_selinux_patch_module_name}}.mod"
+
+# Path to selinux package custom module file
+cobbler_selinux_pp_file_path: "/tmp/{{cobbler_selinux_patch_module_name}}.pp"
+
+# Cobbler selinux booleans
+
+cobbler_selinux_booleans:
+  - cobbler_anon_write
+  - cobbler_can_network_connect
+  - cobbler_use_cifs
+  - cobbler_use_nfs
+  - httpd_can_network_connect_cobbler
+  - httpd_serve_cobbler_files
