@@ -17,13 +17,3 @@ cobbler_loaders_syslinux_dir: /usr/share/syslinux
 # Signatures file path
 
 cobbler_signatures_path: /var/lib/cobbler/distro_signatures.json
-
-# Cobbler selinux booleans
-
-cobbler_selinux_booleans:
-  - cobbler_anon_write
-  - cobbler_can_network_connect
-  - cobbler_use_cifs
-  - cobbler_use_nfs
-  - httpd_can_network_connect_cobbler
-  - httpd_serve_cobbler_files

@@ -2,15 +2,6 @@
 # Configure service tasks
 
 - block:
-    - name: Configure cobbler selinux booleans
-      seboolean:
-        name: "{{ cobbler_selinux_bool }}"
-        state: yes
-        persistent: yes
-      loop: "{{ cobbler_selinux_booleans }}"
-      loop_control:
-        loop_var: cobbler_selinux_bool
-      when: ansible_facts.selinux.status == "enabled"
 
     - name: Enable and start cobblerd service
       service:

@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.1.0] - 2022-04-26
+#### Added
+- Add complete selinux enforced compatibility
+
+
 ## [2.0.0] - 2022-04-26
 #### Added
 - Refactorize to upgrade cobbler to version 3.X
