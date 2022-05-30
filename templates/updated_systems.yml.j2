@@ -1,6 +1,6 @@
 {% set ns = namespace(found=false) %}
 {% for cobbler_system in cobbler_systems | list %}
-{% set saved_system = cobbler_saved_systems[cobbler_system.name] | default({}) %}
+{% set saved_system = _cobbler_saved_systems[cobbler_system.name] | default({}) %}
 {% set default_autoinstall = "default.ks" %}
 {% if saved_system.keys() | list | length == 0
       or saved_system.profile | default(none) != cobbler_system.profile | default(none)
