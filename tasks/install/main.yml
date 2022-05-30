@@ -67,7 +67,6 @@
         - pxelinux.0
       loop_control:
         loop_var: cobbler_loader_item
-
   tags:
     - role::cobbler
     - role::cobbler::install
