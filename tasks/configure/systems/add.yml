@@ -10,7 +10,7 @@
         --kernel-options="{{ cobbler_system.kopts | default([]) | join(' ') }}"
       register: cobbler_system_add_result
       loop: >-
-        {{ cobbler_updated_systems.values()
+        {{ _cobbler_updated_systems.values()
            | selectattr("state", "defined")
            | selectattr("state", "equalto", "present")
            | list }}

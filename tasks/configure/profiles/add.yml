@@ -10,7 +10,7 @@
         mode: 0755
       register: cobbler_autoinstall_add_result
       when: cobbler_profile.autoinstall_content is defined
-      loop: "{{ cobbler_updated_profiles.values() | list }}"
+      loop: "{{ _cobbler_updated_profiles.values() | list }}"
       loop_control:
         loop_var: cobbler_profile
         label: "{{ cobbler_profile.name }}"
@@ -28,7 +28,7 @@
         {{ (cobbler_profile.proxy | default('') | length > 0)
            | ternary("--proxy=" + cobbler_profile.proxy | default(''), "") }}
       register: cobbler_profile_add_result
-      loop: "{{ cobbler_updated_profiles.values() | list }}"
+      loop: "{{ _cobbler_updated_profiles.values() | list }}"
       loop_control:
         loop_var: cobbler_profile
         label: "{{ cobbler_profile.name }}"

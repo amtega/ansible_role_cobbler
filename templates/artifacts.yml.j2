@@ -1,4 +1,4 @@
-{% for cobbler_distro in cobbler_updated_distros.values() | list %}
+{% for cobbler_distro in _cobbler_updated_distros.values() | list %}
 {% set id = "cobbler_" + cobbler_distro.name | regex_replace(" ", "") | regex_replace("-", "_") %}
 {% if cobbler_distro.artifact.dest | default("") | length > 0 %}
 {% set dest = cobbler_iso_dir + "/" + cobbler_distro.artifact.dest %}

@@ -5,12 +5,6 @@
     - include_tasks: clean.yml
     - include_tasks: add.yml
   vars:
-    cobbler_saved_profiles: >-
-      {{ lookup('template', 'saved_profiles.yml.j2') | from_yaml }}
-    cobbler_saved_autoinstalls: >-
-      {{ lookup('template', 'saved_autoinstalls.yml.j2') | from_yaml }}
-    cobbler_updated_profiles: >-
-      {{ lookup('template', 'updated_profiles.yml.j2') | from_yaml }}
     cobbler_autoinstall_file: "profile_{{ cobbler_profile.name }}.ks"
     cobbler_autoinstall_file_path: >-
       {{ cobbler_autoinstall_templates_dir }}/{{ cobbler_autoinstall_file }}
