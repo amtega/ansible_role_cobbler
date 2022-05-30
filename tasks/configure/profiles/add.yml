@@ -40,7 +40,6 @@
                        | ternary(cobbler_profile.autoinstall, "")) }}
         cobbler_profile_kernel_options: >-
           {{ lookup('template', 'kernel_options.yml.j2') | from_yaml }}
-
   tags:
     - role::cobbler
     - role::cobbler::configure

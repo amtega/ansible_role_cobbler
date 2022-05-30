@@ -132,21 +132,6 @@ cobbler_run_install_triggers: yes
 
 cobbler_server: "{{ ansible_facts.default_ipv4.address }}"
 
-# Indicate if loaders must be downloaded unsing get-loaders command. If set to
-# no loaders will be taken directly from the syslinux package
-
-cobbler_get_loaders: no
-
-# Dicts with the cobbler signatures to manage. The dict has the same format that
-# the cobbler json signature file. If defined the signatures will not be updated
-# using the variables cobbler_update_signatures and cobbler_signatures_url
-# detailed below
-#
-# cobbler_signatures:
-
-cobbler_update_signatures: yes
-#cobbler_signatures_url:
-
 cobbler_client_use_localhost: no
 cobbler_client_use_https: no
 
@@ -194,6 +179,11 @@ cobbler_scm_track_mode: "git"
 cobbler_scm_track_author: "cobbler <cobbler@localhost>"
 cobbler_scm_push_script: "/bin/true"
 
+# Indicate if loaders must be downloaded unsing get-loaders command. If set to
+# no loaders will be taken directly from the syslinux package
+
+cobbler_get_loaders: no
+
 # Cobbler modules
 
 cobbler_module_authentication: authentication.configfile
@@ -202,6 +192,16 @@ cobbler_module_authorization: authorization.allowall
 cobbler_module_dhcp: managers.dnsmasq
 cobbler_module_dns: managers.dnsmasq
 cobbler_module_tftpd: managers.in_tftpd
+
+# List of dicts with the cobbler signatures to manage. The dict has the same
+# format that the cobbler json signature file. If defined the signatures will
+# not be updated using the variables cobbler_update_signatures and
+# cobbler_signatures_url detailed below
+#
+# cobbler_signatures:
+
+cobbler_update_signatures: yes
+#cobbler_signatures_url:
 
 # List of dicts with the cobbler distros to manage. The format of the list items
 # is:
