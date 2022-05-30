@@ -6,7 +6,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [2.2.0] - 2022-04-26
+## [2.2.0] - 2022-05-30
 #### Added
 - Fixed deletion of valid distros, profiles and systems.
 - Fixed performance problems.
