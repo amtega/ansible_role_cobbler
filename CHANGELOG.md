@@ -6,19 +6,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.2.1] - 2022-05-30
+### Fixed
+- Minor fixes
+
 ## [2.2.0] - 2022-05-30
-#### Added
+### Added
 - Fixed deletion of valid distros, profiles and systems.
 - Fixed performance problems.
-#### Fixed
+### Fixed
 - Fix tag problems.
 
 ## [2.1.0] - 2022-04-26
-#### Added
+### Added
 - Add complete selinux enforced compatibility
 
 ## [2.0.0] - 2022-04-26
-#### Added
+### Added
 - Refactorize to upgrade cobbler to version 3.X
 - Any version of systems based on redhat prior to 8 is no longer supported
 - Force selinux to permissive
