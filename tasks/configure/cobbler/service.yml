@@ -2,7 +2,6 @@
 # Configure service tasks
 
 - block:
-
     - name: Enable and start cobblerd service
       service:
         name: cobblerd

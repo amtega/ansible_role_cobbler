@@ -2,7 +2,6 @@
 # Read systems
 
 - block:
-
     - name: Search systems config files
       find:
         paths: "{{ cobbler_config_dir }}/systems"

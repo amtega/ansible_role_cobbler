@@ -42,3 +42,4 @@ This role is distributed in the hope that it will be useful, but WITHOUT ANY WAR
 ## Author Information
 
 - Juan Antonio Valiño García.
+- José Enrique Mourón Regueira

@@ -11,12 +11,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed deletion of valid distros, profiles and systems.
 - Fixed performance problems.
 #### Fixed
-- Fix tag problemas
+- Fix tag problems.
 
 ## [2.1.0] - 2022-04-26
 #### Added
 - Add complete selinux enforced compatibility
-
 
 ## [2.0.0] - 2022-04-26
 #### Added
