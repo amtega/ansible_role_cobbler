@@ -29,8 +29,13 @@ dependencies:
       selinux_mode: "{{ cobbler_selinux_mode }}"
 
   - role: amtega.epel
+    when: not cobbler_systems_only | bool
+
   - role: amtega.proxy_client
+    when: not cobbler_systems_only | bool
+
   - role: amtega.tftpd
+    when: not cobbler_systems_only | bool
 
   - role: amtega.artifact
     tags:
