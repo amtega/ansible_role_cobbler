@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.3.0] - 2022-06-16
+### Added
+- Added suppport for jinja3
+
 ## [2.2.1] - 2022-05-30
 ### Fixed
 - Minor fixes
