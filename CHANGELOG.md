@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.4.5] - 2022-06-16
+### Added
+- Added suppport for jinja3
+
 ## [1.4.4] - 2022-05-10
 ### Fixed
 - Fixed deletion of valid distros, profiles and systems.
