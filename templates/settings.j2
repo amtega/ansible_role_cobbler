@@ -19,26 +19,26 @@ boot_loader_conf_template_dir: {{ cobbler_boot_loader_conf_template_dir }}
 build_reporting_enabled: {{ cobbler_build_reporting_enabled | bool }}
 build_reporting_sender: {{ cobbler_build_reporting_sender }}
 build_reporting_email:
-{{ cobbler_build_reporting_email | to_nice_yaml | indent(width=2, indentfirst=True) }}
+{{ cobbler_build_reporting_email | to_nice_yaml | indent(width=2, first=True) }}
 build_reporting_smtp_server: {{ cobbler_build_reporting_smtp_server }}
 build_reporting_subject: {{ cobbler_build_reporting_subject }}
 build_reporting_ignorelist:
-{{ cobbler_build_reporting_ignorelist | to_nice_yaml | indent(width=2, indentfirst=True) }}
+{{ cobbler_build_reporting_ignorelist | to_nice_yaml | indent(width=2, first=True) }}
 
 cache_enabled: {{ cobbler_cache_enabled }}
 
 cheetah_import_whitelist:
-{{ cobbler_cheetah_import_whitelist | to_nice_yaml | indent(width=2, indentfirst=True) }}
+{{ cobbler_cheetah_import_whitelist | to_nice_yaml | indent(width=2, first=True) }}
 
 createrepo_flags: {{ cobbler_createrepo_flags }}
 
 default_name_servers:
-{{ cobbler_default_name_servers | to_nice_yaml | indent(width=2, indentfirst=True) }}
+{{ cobbler_default_name_servers | to_nice_yaml | indent(width=2, first=True) }}
 default_name_servers_search:
-{{ cobbler_default_name_servers_search | to_nice_yaml | indent(width=2, indentfirst=True) }}
+{{ cobbler_default_name_servers_search | to_nice_yaml | indent(width=2, first=True) }}
 
 default_ownership:
-{{ cobbler_default_ownership | to_nice_yaml | indent(width=2, indentfirst=True) }}
+{{ cobbler_default_ownership | to_nice_yaml | indent(width=2, first=True) }}
 
 default_password_crypted: {{ cobbler_default_password_crypted }}
 
@@ -56,7 +56,7 @@ enable_menu: {{ cobbler_enable_menu | bool }}
 http_port: {{ cobbler_http_port }}
 
 kernel_options:
-{{ cobbler_kernel_options | to_nice_yaml | indent(width=2, indentfirst=True) }}
+{{ cobbler_kernel_options | to_nice_yaml | indent(width=2, first=True) }}
 
 
 ldap_server: {{ cobbler_ldap_server }}
@@ -72,9 +72,9 @@ ldap_tls_keyfile: {{ cobbler_ldap_tls_keyfile }}
 ldap_tls_certfile: {{ cobbler_ldap_tls_certfile}}
 
 mgmt_classes:
-{{ cobbler_mgmt_classes | to_nice_yaml | indent(width=2, indentfirst=True) }}
+{{ cobbler_mgmt_classes | to_nice_yaml | indent(width=2, first=True) }}
 mgmt_parameters:
-{{ cobbler_mgmt_parameters | to_nice_yaml | indent(width=2, indentfirst=True) }}
+{{ cobbler_mgmt_parameters | to_nice_yaml | indent(width=2, first=True) }}
 
 puppet_auto_setup: {{ cobbler_puppet_auto_setup | bool }}
 sign_puppet_certs_automatically: {{ cobbler_sign_puppet_certs_automatically | bool }}
@@ -94,9 +94,9 @@ tftpboot_location: {{ cobbler_tftpboot_location }}
 manage_rsync: {{ cobbler_manage_rsync | bool }}
 
 manage_forward_zones:
-{{ cobbler_manage_forward_zones | to_nice_yaml | indent(width=2, indentfirst=True) }}
+{{ cobbler_manage_forward_zones | to_nice_yaml | indent(width=2, first=True) }}
 manage_reverse_zones:
-{{ cobbler_manage_reverse_zones | to_nice_yaml | indent(width=2, indentfirst=True) }}
+{{ cobbler_manage_reverse_zones | to_nice_yaml | indent(width=2, first=True) }}
 
 next_server: {{ cobbler_next_server }}
 
@@ -132,7 +132,7 @@ virt_auto_boot: {{ cobbler_virt_auto_boot | bool }}
 
 webdir: {{ cobbler_webdir }}
 webdir_whitelist:
-{{ cobbler_webdir_whitelist | to_nice_yaml | indent(width=2, indentfirst=True) }}
+{{ cobbler_webdir_whitelist | to_nice_yaml | indent(width=2, first=True) }}
 
 xmlrpc_port: {{ cobbler_xmlrpc_port }}
 
@@ -156,4 +156,4 @@ scm_track_author: {{ cobbler_scm_track_author }}
 scm_push_script: {{ cobbler_scm_push_script }}
 
 include:
-{{ cobbler_include | to_nice_yaml | indent(width=2, indentfirst=True) }}
+{{ cobbler_include | to_nice_yaml | indent(width=2, first=True) }}
